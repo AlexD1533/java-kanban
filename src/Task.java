@@ -15,16 +15,10 @@ public class Task {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
-                "," +
+
                 '}';
     }
 
-    public Task(int id, String name, String description, TaskType type) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-this.type = type;
-    }
 
     public Task(int id, String name, String description, TaskType type, TaskProgress status) {
         this.id = id;
