@@ -4,20 +4,14 @@ import java.util.Map;
 public class TaskManager {
     private static int counter = 0;
 
-    private static Map<Integer, Task> tasks = new HashMap<>();
-    private static Map<Integer, Epic> epics = new HashMap<>();
+    private static final Map<Integer, Task> tasks = new HashMap<>();
+    private static final Map<Integer, Epic> epics = new HashMap<>();
 
-    public static Map<Integer, Epic> getEpics() {
-        return epics;
-    }
 
-    public static Map<Integer, Task> getTasks() {
-        return tasks;
-    }
 
-    public Map<Integer, Subtask> getAllSubtasks() {
+    public Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics) {
         Map<Integer, Subtask> currentSubtask = new HashMap<>();
-        for (Epic task : TaskManager.getEpics().values()) {
+        for (Epic task : epics.values()) {
             currentSubtask.putAll(task.getSubtasks());
         }
         return currentSubtask;
@@ -39,7 +33,7 @@ public class TaskManager {
                 System.out.println("Эпик создан: " + id + " " + name);
                 break;
             case SUBTASK:
-                if (!Validation.epicValidation(epicId)) {
+                if (!Validation.epicValidation(epicId, epics)) {
                     break;
                 }
                 epics.get(epicId).getSubtasks().put(id, new Subtask(id, name, description, type, epicId, status));
@@ -77,7 +71,7 @@ public class TaskManager {
                     System.out.println("Задач такого типа нет");
                     return;
                 }
-                System.out.println(getAllSubtasks());
+                System.out.println(getAllSubtasks(epics));
 
                 break;
             default:
@@ -116,23 +110,23 @@ public class TaskManager {
 
         switch (type) {
             case TASK:
-                if (!Validation.taskValidation(id)) {
+                if (!Validation.taskValidation(id, tasks)) {
                     break;
                 }
                 tasks.remove(id);
                 break;
             case EPIC:
-                if (!Validation.epicValidation(id)) {
+                if (!Validation.epicValidation(id, epics)) {
                     break;
                 }
                 epics.remove(id);
                 break;
             case SUBTASK:
-                if (!Validation.subTaskValidation(id)) {
+                if (!Validation.subTaskValidation(id, epics)) {
                     break;
                 }
-                int epicId = getAllSubtasks().get(id).getEpicId();
-                if (!Validation.subTaskValidationByEpic(epicId, id)) {
+                int epicId = getAllSubtasks(epics).get(id).getEpicId();
+                if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
                     break;
                 }
                 epics.get(epicId).getSubtasks().remove(id);
@@ -177,22 +171,22 @@ public class TaskManager {
     public void findById(TaskType type, int id) {
         switch (type) {
             case TASK:
-                if (!Validation.taskValidation(id)) {
+                if (!Validation.taskValidation(id, tasks)) {
                     break;
                 }
                 System.out.println(tasks.get(id));
                 break;
             case EPIC:
-                if (!Validation.epicValidation(id)) {
+                if (!Validation.epicValidation(id, epics)) {
                     break;
                 }
                 System.out.println(epics.get(id));
                 break;
             case SUBTASK:
-                if (!Validation.subTaskValidation(id)) {
+                if (!Validation.subTaskValidation(id, epics)) {
                     break;
                 }
-                int epicId = getAllSubtasks().get(id).getEpicId();
+                int epicId = getAllSubtasks(epics).get(id).getEpicId();
                 System.out.println(epics.get(epicId).getSubtasks().get(id));
                 break;
             default:
@@ -204,14 +198,14 @@ public class TaskManager {
     public void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId) {
         switch (type) {
             case TASK:
-                if (!Validation.taskValidation(id)) {
+                if (!Validation.taskValidation(id, tasks)) {
                     break;
                 }
                 tasks.put(id, new Task(id, name, description, type, status));
                 System.out.println("Задача обновлена: " + id + " " + name);
                 break;
             case EPIC:
-                if (!Validation.epicValidation(epicId)) {
+                if (!Validation.epicValidation(epicId, epics)) {
                     break;
                 }
                 TaskProgress defaultStatus = TaskProgress.NEW;
@@ -219,10 +213,10 @@ public class TaskManager {
                 System.out.println("Эпик обновлен: " + id + " " + name);
                 break;
             case SUBTASK:
-                if (!Validation.epicValidation(epicId)) {
+                if (!Validation.epicValidation(epicId, epics)) {
                     break;
                 }
-                if (!Validation.subTaskValidationByEpic(epicId, id)) {
+                if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
                     break;
                 }
                 epics.get(epicId).getSubtasks().put(id, new Subtask(id, name, description, type, epicId, status));
@@ -237,14 +231,14 @@ public class TaskManager {
 
     public void getEpicTasks(int id) {
 
-        if (!Validation.epicValidation(id)) {
+        if (!Validation.epicValidation(id, epics)) {
             return;
         }
         System.out.println("Информация о эпике:");
         System.out.println(epics.get(id));
         System.out.println("Подзадачи: ");
 
-        if (!Validation.subTasksEmptyValidationByEpic(id)) {
+        if (!Validation.subTasksEmptyValidationByEpic(id, epics)) {
             return;
         }
 
@@ -252,7 +246,7 @@ public class TaskManager {
     }
 
     public void updateEpicTaskStatus(int epicId) {
-        if (!Validation.epicValidation(epicId)) {
+        if (!Validation.epicValidation(epicId, epics)) {
             return;
         }
         int newCount = 0;
