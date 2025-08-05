@@ -1,13 +1,9 @@
 public class Task {
-    public int getId() {
-        return id;
-    }
 
     private final int id;
     private final String name;
     private final String description;
     private TaskProgress status;
-
     private final TaskType type;
 
     @Override
@@ -34,5 +30,8 @@ public class Task {
     }
     public void setStatus(TaskProgress status) {
         this.status = status;
+    }
+    public int getId() {
+        return id;
     }
 }
