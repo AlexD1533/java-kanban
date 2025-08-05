@@ -1,12 +1,14 @@
 public class Task {
+    public int getId() {
+        return id;
+    }
 
+    private final int id;
+    private final String name;
+    private final String description;
+    private TaskProgress status;
 
-    private int id;
-    private String name;
-    private String description;
-    private TaskProgress status = TaskProgress.NEW;
-
-    private TaskType type;
+    private final TaskType type;
 
     @Override
     public String toString() {
@@ -19,7 +21,6 @@ public class Task {
                 '}';
     }
 
-
     public Task(int id, String name, String description, TaskType type, TaskProgress status) {
         this.id = id;
         this.name = name;
@@ -28,42 +29,11 @@ public class Task {
         this.type = type;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public TaskProgress getStatus() {
         return status;
     }
-
     public void setStatus(TaskProgress status) {
         this.status = status;
-    }
-    public TaskType getType() {
-        return type;
-    }
-
-    public void setType(TaskType type) {
-        this.type = type;
     }
 }

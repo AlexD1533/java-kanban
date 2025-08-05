@@ -5,6 +5,9 @@ public class Main {
 
 TaskManager taskManager = new TaskManager();
 
+
+            taskManager.createTask(TaskType.TASK, "sdasdas", "Выполнить работу", 0, TaskProgress.NEW);
+
         taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0, TaskProgress.NEW);
         taskManager.createTask(TaskType.TASK, "Задача 2", "Выполнить работу", 0, TaskProgress.NEW);
 

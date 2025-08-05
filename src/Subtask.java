@@ -1,5 +1,9 @@
 public class Subtask extends Task {
 
+    public int getEpicId() {
+        return epicId;
+    }
+
     private int epicId;
 
     public Subtask(int id, String name, String description, TaskType type, int epicId, TaskProgress status) {
