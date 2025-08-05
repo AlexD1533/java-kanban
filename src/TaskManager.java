@@ -4,12 +4,13 @@ import java.util.Map;
 public class TaskManager {
     private static int counter = 0;
 
-    private  static Map<Integer, Task> tasks = new HashMap<>();
-    private  static Map<Integer, Epic> epics = new HashMap<>();
+    private static Map<Integer, Task> tasks = new HashMap<>();
+    private static Map<Integer, Epic> epics = new HashMap<>();
 
     public static Map<Integer, Epic> getEpics() {
         return epics;
     }
+
     public static Map<Integer, Task> getTasks() {
         return tasks;
     }
@@ -23,33 +24,34 @@ public class TaskManager {
     }
 
     public void createTask(TaskType type, String name, String description, int epicId, TaskProgress status) {
-       if (!Validation.inputValidation(name, status)) {
-           return;
-       }
-           int id = counter++;
-           switch (type) {
-               case TASK:
-                   tasks.put(id, new Task(id, name, description, type, status));
-                   System.out.println("Задача создана: " + id + " " + name);
-                   break;
-               case EPIC:
-                   TaskProgress defaultStatus = TaskProgress.NEW;
-                   epics.put(id, new Epic(id, name, description, type, defaultStatus));
-                   System.out.println("Эпик создан: " + id + " " + name);
-                   break;
-               case SUBTASK:
-                   if (!Validation.epicValidation(epicId)) {
-                       break;
-                   }
-                   epics.get(epicId).getSubtasks().put(id, new Subtask(id, name, description, type, epicId, status));
-                   updateEpicTaskStatus(epicId);
-                   System.out.println("Подзадача создана: " + id + " " + name + " в эпике №" + epicId);
-                   break;
-               default:
-                   System.out.println("Неправильный тип задачи");
-                   break;
-           }
+        if (!Validation.inputValidation(name, status)) {
+            return;
+        }
+        int id = counter++;
+        switch (type) {
+            case TASK:
+                tasks.put(id, new Task(id, name, description, type, status));
+                System.out.println("Задача создана: " + id + " " + name);
+                break;
+            case EPIC:
+                TaskProgress defaultStatus = TaskProgress.NEW;
+                epics.put(id, new Epic(id, name, description, type, defaultStatus));
+                System.out.println("Эпик создан: " + id + " " + name);
+                break;
+            case SUBTASK:
+                if (!Validation.epicValidation(epicId)) {
+                    break;
+                }
+                epics.get(epicId).getSubtasks().put(id, new Subtask(id, name, description, type, epicId, status));
+                updateEpicTaskStatus(epicId);
+                System.out.println("Подзадача создана: " + id + " " + name + " в эпике №" + epicId);
+                break;
+            default:
+                System.out.println("Неправильный тип задачи");
+                break;
+        }
     }
+
     public void printTasksByType(TaskType type) {
         switch (type) {
             case TASK:
@@ -75,7 +77,7 @@ public class TaskManager {
                     System.out.println("Задач такого типа нет");
                     return;
                 }
-                        System.out.println(getAllSubtasks());
+                System.out.println(getAllSubtasks());
 
                 break;
             default:
@@ -85,7 +87,6 @@ public class TaskManager {
     }
 
     public void deleteTasksByType(TaskType type) {
-
         switch (type) {
             case TASK:
                 tasks.clear();
@@ -95,17 +96,20 @@ public class TaskManager {
                 epics.clear();
                 break;
             case SUBTASK:
+
+                if (epics.isEmpty()) {
+                    System.out.println("Задач такого типа нет");
+                    return;
+                }
                 for (Epic task : epics.values()) {
                     task.getSubtasks().clear();
                     updateEpicTaskStatus(task.getId());
                 }
-
                 break;
             default:
                 System.out.println("Неправильный тип задачи");
                 break;
         }
-
     }
 
     public void deleteTasksById(TaskType type, int id) {
@@ -128,7 +132,10 @@ public class TaskManager {
                     break;
                 }
                 int epicId = getAllSubtasks().get(id).getEpicId();
-                epics.get(epicId).getSubtasks().clear();
+                if (!Validation.subTaskValidationByEpic(epicId, id)) {
+                    break;
+                }
+                epics.get(epicId).getSubtasks().remove(id);
                 updateEpicTaskStatus(epicId);
                 break;
             default:
@@ -138,25 +145,36 @@ public class TaskManager {
     }
 
     public void printAllTasks() {
+        if (tasks.isEmpty())  {
+            System.out.println("Задач нет");
+        }
+        if (epics.isEmpty()) {
+            System.out.println("Эпиков нет");
+        }
         for (Task task : tasks.values()) {
-            System.out.println(task);
+            if (task != null) {
+                System.out.println(task);
+            }
         }
         for (Epic task : epics.values()) {
-            System.out.println(task);
+            if (task != null) {
+                System.out.println(task);
+            }
         }
         for (Epic task : epics.values()) {
-            System.out.println(task.getSubtasks().values());
+            if (!task.getSubtasks().isEmpty()) {
+                System.out.println(task.getSubtasks().values());
+            }
         }
     }
-
 
     public void deleteAllTasks() {
         tasks.clear();
         epics.clear();
         System.out.println("Все задачи удалены");
     }
-    public void findById(TaskType type, int id) {
 
+    public void findById(TaskType type, int id) {
         switch (type) {
             case TASK:
                 if (!Validation.taskValidation(id)) {
@@ -175,7 +193,7 @@ public class TaskManager {
                     break;
                 }
                 int epicId = getAllSubtasks().get(id).getEpicId();
-                    System.out.println( epics.get(epicId).getSubtasks().get(id));
+                System.out.println(epics.get(epicId).getSubtasks().get(id));
                 break;
             default:
                 System.out.println("Неправильный тип задачи");
@@ -184,11 +202,9 @@ public class TaskManager {
     }
 
     public void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId) {
-
         switch (type) {
             case TASK:
-                if (!tasks.containsKey(id)) {
-                    System.out.println("Такой задачи не существует");
+                if (!Validation.taskValidation(id)) {
                     break;
                 }
                 tasks.put(id, new Task(id, name, description, type, status));
@@ -203,12 +219,14 @@ public class TaskManager {
                 System.out.println("Эпик обновлен: " + id + " " + name);
                 break;
             case SUBTASK:
-
                 if (!Validation.epicValidation(epicId)) {
                     break;
                 }
+                if (!Validation.subTaskValidationByEpic(epicId, id)) {
+                    break;
+                }
                 epics.get(epicId).getSubtasks().put(id, new Subtask(id, name, description, type, epicId, status));
-                System.out.println("Подзадача обновлена: " + id + " " + name + " в эпике №" + epicId);
+                System.out.println("Подзадача обновлена: " + id + " " + name + " в эпике: " + epicId);
                 updateEpicTaskStatus(epicId);
                 break;
             default:
@@ -222,12 +240,21 @@ public class TaskManager {
         if (!Validation.epicValidation(id)) {
             return;
         }
+        System.out.println("Информация о эпике:");
         System.out.println(epics.get(id));
         System.out.println("Подзадачи: ");
+
+        if (!Validation.subTasksEmptyValidationByEpic(id)) {
+            return;
+        }
+
         System.out.println(epics.get(id).getSubtasks().values());
     }
 
     public void updateEpicTaskStatus(int epicId) {
+        if (!Validation.epicValidation(epicId)) {
+            return;
+        }
         int newCount = 0;
         int doneCount = 0;
         for (Subtask task : epics.get(epicId).getSubtasks().values()) {
@@ -240,12 +267,12 @@ public class TaskManager {
         if (newCount == epics.get(epicId).getSubtasks().values().size() ||
                 epics.get(epicId).getSubtasks().values().isEmpty()) {
             epics.get(epicId).setStatus(TaskProgress.NEW);
-        } else if (doneCount == epics.get(epicId).getSubtasks().values().size())  {
+        } else if (doneCount == epics.get(epicId).getSubtasks().values().size()) {
             epics.get(epicId).setStatus(TaskProgress.DONE);
-            } else {
+        } else {
             epics.get(epicId).setStatus(TaskProgress.IN_PROGRESS);
-            }
         }
     }
+}
 
 

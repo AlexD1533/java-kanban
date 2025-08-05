@@ -29,7 +29,6 @@ public class Task {
         this.type = type;
     }
 
-
     public TaskProgress getStatus() {
         return status;
     }
