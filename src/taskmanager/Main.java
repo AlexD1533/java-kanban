@@ -1,3 +1,9 @@
+package taskmanager;
+
+import taskmanager.manager.*;
+import taskmanager.model.*;
+
+
 public class Main {
 
     public static void main(String[] args) {

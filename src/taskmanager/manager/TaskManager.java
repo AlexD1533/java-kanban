@@ -1,3 +1,9 @@
+package taskmanager.manager;
+
+import taskmanager.model.*;
+import taskmanager.util.*;
+import taskmanager.model.Task;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,16 +26,16 @@ public class TaskManager {
         }
         int id = counter++;
         switch (type) {
-            case TASK:
+            case TaskType.TASK:
                 tasks.put(id, new Task(id, name, description, type, status));
                 System.out.println("Задача создана: " + id + " " + name);
                 break;
-            case EPIC:
+            case TaskType.EPIC:
                 TaskProgress defaultStatus = TaskProgress.NEW;
                 epics.put(id, new Epic(id, name, description, type, defaultStatus));
                 System.out.println("Эпик создан: " + id + " " + name);
                 break;
-            case SUBTASK:
+            case TaskType.SUBTASK:
                 if (!Validation.epicValidation(epicId, epics)) {
                     break;
                 }
@@ -45,7 +51,7 @@ public class TaskManager {
 
     public void printTasksByType(TaskType type) {
         switch (type) {
-            case TASK:
+            case TaskType.TASK:
                 if (tasks.isEmpty()) {
                     System.out.println("Задач такого типа нет");
                     return;
@@ -54,7 +60,7 @@ public class TaskManager {
                     System.out.println(task);
                 }
                 break;
-            case EPIC:
+            case TaskType.EPIC:
                 if (epics.isEmpty()) {
                     System.out.println("Задач такого типа нет");
                     return;
@@ -63,7 +69,7 @@ public class TaskManager {
                     System.out.println(task);
                 }
                 break;
-            case SUBTASK:
+            case TaskType.SUBTASK:
                 if (epics.isEmpty()) {
                     System.out.println("Задач такого типа нет");
                     return;
@@ -79,14 +85,14 @@ public class TaskManager {
 
     public void deleteTasksByType(TaskType type) {
         switch (type) {
-            case TASK:
+            case TaskType.TASK:
                 tasks.clear();
                 break;
-            case EPIC:
+            case TaskType.EPIC:
 
                 epics.clear();
                 break;
-            case SUBTASK:
+            case TaskType.SUBTASK:
 
                 if (epics.isEmpty()) {
                     System.out.println("Задач такого типа нет");
@@ -106,19 +112,19 @@ public class TaskManager {
     public void deleteTasksById(TaskType type, int id) {
 
         switch (type) {
-            case TASK:
+            case TaskType.TASK:
                 if (!Validation.taskValidation(id, tasks)) {
                     break;
                 }
                 tasks.remove(id);
                 break;
-            case EPIC:
+            case TaskType.EPIC:
                 if (!Validation.epicValidation(id, epics)) {
                     break;
                 }
                 epics.remove(id);
                 break;
-            case SUBTASK:
+            case TaskType.SUBTASK:
                 if (!Validation.subTaskValidation(id, epics)) {
                     break;
                 }
@@ -167,19 +173,19 @@ public class TaskManager {
 
     public void findById(TaskType type, int id) {
         switch (type) {
-            case TASK:
+            case TaskType.TASK:
                 if (!Validation.taskValidation(id, tasks)) {
                     break;
                 }
                 System.out.println(tasks.get(id));
                 break;
-            case EPIC:
+            case TaskType.EPIC:
                 if (!Validation.epicValidation(id, epics)) {
                     break;
                 }
                 System.out.println(epics.get(id));
                 break;
-            case SUBTASK:
+            case TaskType.SUBTASK:
                 if (!Validation.subTaskValidation(id, epics)) {
                     break;
                 }
@@ -194,14 +200,14 @@ public class TaskManager {
 
     public void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId) {
         switch (type) {
-            case TASK:
+            case TaskType.TASK:
                 if (!Validation.taskValidation(id, tasks)) {
                     break;
                 }
                 tasks.put(id, new Task(id, name, description, type, status));
                 System.out.println("Задача обновлена: " + id + " " + name);
                 break;
-            case EPIC:
+            case TaskType.EPIC:
                 if (!Validation.epicValidation(epicId, epics)) {
                     break;
                 }
@@ -209,7 +215,7 @@ public class TaskManager {
                 epics.put(id, new Epic(id, name, description, type, defaultStatus));
                 System.out.println("Эпик обновлен: " + id + " " + name);
                 break;
-            case SUBTASK:
+            case TaskType.SUBTASK:
                 if (!Validation.epicValidation(epicId, epics)) {
                     break;
                 }

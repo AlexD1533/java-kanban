@@ -1,6 +1,6 @@
-import java.util.ArrayList;
+package taskmanager.model;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Epic extends Task {
