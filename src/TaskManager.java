@@ -3,11 +3,8 @@ import java.util.Map;
 
 public class TaskManager {
     private static int counter = 0;
-
     private static final Map<Integer, Task> tasks = new HashMap<>();
     private static final Map<Integer, Epic> epics = new HashMap<>();
-
-
 
     public Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics) {
         Map<Integer, Subtask> currentSubtask = new HashMap<>();
@@ -261,7 +258,7 @@ public class TaskManager {
         if (newCount == epics.get(epicId).getSubtasks().values().size() ||
                 epics.get(epicId).getSubtasks().values().isEmpty()) {
             epics.get(epicId).setStatus(TaskProgress.NEW);
-        } else if (doneCount == epics.get(epicId).getSubtasks().values().size()) {
+        } else if (doneCount == epics.get(epicId).getSubtasks().size()) {
             epics.get(epicId).setStatus(TaskProgress.DONE);
         } else {
             epics.get(epicId).setStatus(TaskProgress.IN_PROGRESS);

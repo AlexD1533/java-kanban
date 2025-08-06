@@ -2,7 +2,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class Validation {
-
     public static boolean inputValidation(String name, TaskProgress status) {
         if (name == null || name.isBlank()) {
             System.out.println("Имя не должно быть пустым");
@@ -13,7 +12,6 @@ public final class Validation {
     }
 
     public static boolean epicValidation(int id, Map<Integer, Epic> epics) {
-
         if (!epics.containsKey(id)) {
             System.out.println("Эпик " + id + " не существует.");
             return false;
@@ -30,7 +28,6 @@ public final class Validation {
     }
 
     public static boolean subTaskValidation(int id, Map<Integer, Epic> epics) {
-
         Map<Integer, Subtask> currentSubtask = new HashMap<>();
         for (Epic task : epics.values()) {
             currentSubtask.putAll(task.getSubtasks());
@@ -49,6 +46,7 @@ public final class Validation {
         }
         return true;
     }
+
     public static boolean subTasksEmptyValidationByEpic(int id,  Map<Integer, Epic> epics) {
         if (epics.get(id).getSubtasks().isEmpty()) {
             System.out.println("Список подзадач в эпике: " + id + " пуст");
