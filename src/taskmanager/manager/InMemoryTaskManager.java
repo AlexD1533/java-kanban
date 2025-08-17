@@ -30,10 +30,12 @@ public HistoryManager<Task> getHistoryManager() {
     }
     @Override
     public void getSubtask(int id) {
-        if (!Validation.epicValidation(id, epics)) {
+
+        if (!Validation.subTaskValidation(id, epics)) {
             return;
         }
         int epicId = getAllSubtasks(epics).get(id).getEpicId();
+
         if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
             return;
         }

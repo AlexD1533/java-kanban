@@ -10,7 +10,6 @@ public class Main {
         System.out.println("Поехали!");
 
 
-
         TaskManager taskManager = Managers.getDefault();
 
         taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0, TaskProgress.NEW);
@@ -38,10 +37,26 @@ public class Main {
         taskManager.getTask(0);
         taskManager.getTask(1);
         taskManager.getEpic(2);
+taskManager.getSubtask(3);
 
 
+        taskManager.getTask(0);
+        taskManager.getTask(1);
+        taskManager.getEpic(2);
+        taskManager.getTask(0);
+        taskManager.getTask(1);
+        taskManager.getEpic(2);
+        taskManager.getSubtask(3);
+        taskManager.getSubtask(3);
+        taskManager.getSubtask(3);
+        taskManager.getSubtask(3);
+        taskManager.getSubtask(3);
         System.out.println("History");
-        System.out.println(taskManager.getHistoryManager().getHistory());
+
+        for (Task task : taskManager.getHistoryManager().getHistory()) {
+            System.out.println(task);
+    }
+
 
     }
 }
