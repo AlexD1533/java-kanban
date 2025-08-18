@@ -11,48 +11,7 @@ public class InMemoryTaskManager implements TaskManager {
     private static int counter = 0;
     private static final Map<Integer, Task> tasks = new HashMap<>();
     private static final Map<Integer, Epic> epics = new HashMap<>();
-
     private final HistoryManager<Task> historyManager = Managers.getDefaultHistory();
-
-@Override
-public HistoryManager<Task> getHistoryManager() {
-    return historyManager;
-}
-
-
-    @Override
-    public Task getTask(int id) {
-        if (!Validation.taskValidation(id, tasks)) {
-            return null;
-        }
-
-        historyManager.addTask(tasks.get(id));
-        return tasks.get(id);
-    }
-    @Override
-    public Subtask getSubtask(int id) {
-
-        if (!Validation.subTaskValidation(id, epics)) {
-            return null;
-        }
-        int epicId = getAllSubtasks(epics).get(id).getEpicId();
-
-        if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
-            return null;
-        }
-        historyManager.addTask(epics.get(epicId).getSubtasks().get(id));
-return epics.get(epicId).getSubtasks().get(id);
-    }
-    @Override
-    public Epic getEpic(int id) {
-
-        if (!Validation.epicValidation(id, epics)) {
-            return null;
-        }
-        historyManager.addTask(epics.get(id));
-return epics.get(id);
-    }
-
 
 
     @Override
@@ -84,8 +43,6 @@ return epics.get(id);
                 break;
         }
     }
-
-
 
     @Override
     public void deleteTasksByType(TaskType type) {
@@ -181,9 +138,6 @@ return epics.get(id);
         return tasks.isEmpty() && epics.isEmpty();
     }
 
-
-
-
     @Override
     public void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId) {
         switch (type) {
@@ -198,8 +152,10 @@ return epics.get(id);
                 if (!Validation.epicValidation(id, epics)) {
                     break;
                 }
+                Map<Integer, Subtask> currentSubtasksList = epics.get(id).getSubtasks();
                 TaskProgress defaultStatus = TaskProgress.NEW;
                 epics.put(id, new Epic(id, name, description, type, defaultStatus));
+                epics.get(id).setSubtasks(currentSubtasksList);
                 System.out.println("Эпик обновлен: " + id + " " + name);
                 break;
             case TaskType.SUBTASK:
@@ -302,6 +258,42 @@ return epics.get(id);
         } else {
             epics.get(epicId).setStatus(TaskProgress.IN_PROGRESS);
         }
+    }
+    @Override
+    public HistoryManager<Task> getHistoryManager() {
+        return historyManager;
+    }
+    @Override
+    public Task getTask(int id) {
+        if (!Validation.taskValidation(id, tasks)) {
+            return null;
+        }
+
+        historyManager.addTask(tasks.get(id));
+        return tasks.get(id);
+    }
+    @Override
+    public Subtask getSubtask(int id) {
+
+        if (!Validation.subTaskValidation(id, epics)) {
+            return null;
+        }
+        int epicId = getAllSubtasks(epics).get(id).getEpicId();
+
+        if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
+            return null;
+        }
+        historyManager.addTask(epics.get(epicId).getSubtasks().get(id));
+        return epics.get(epicId).getSubtasks().get(id);
+    }
+    @Override
+    public Epic getEpic(int id) {
+
+        if (!Validation.epicValidation(id, epics)) {
+            return null;
+        }
+        historyManager.addTask(epics.get(id));
+        return epics.get(id);
     }
 }
 

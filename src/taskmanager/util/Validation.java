@@ -31,7 +31,6 @@ public final class Validation {
         }
         return true;
     }
-
     public static boolean subTaskValidation(int id, Map<Integer, Epic> epics) {
         Map<Integer, Subtask> currentSubtask = new HashMap<>();
         for (Epic task : epics.values()) {
@@ -43,7 +42,6 @@ public final class Validation {
         }
         return true;
     }
-
 
     public static boolean subTaskValidationByEpic(int epicId, int id,  Map<Integer, Epic> epics) {
         if (!epics.get(epicId).getSubtasks().containsKey(id)) {

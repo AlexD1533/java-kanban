@@ -7,9 +7,6 @@ import java.util.Map;
 
 public interface TaskManager {
 
-
-
-
     Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics);
 
     void createTask(TaskType type, String name, String description, int epicId, TaskProgress status);

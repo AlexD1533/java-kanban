@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryHistoryManager <T extends Task> implements HistoryManager<T>{
-
   private final List<Task> history = new ArrayList<>(10);
-
 
     @Override
     public void addTask(T task) {
@@ -17,7 +15,6 @@ public class InMemoryHistoryManager <T extends Task> implements HistoryManager<T
         }
 history.add(task);
     }
-
 
     @Override
     public List<Task> getHistory() {

@@ -8,8 +8,6 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
-
-
         TaskManager taskManager = Managers.getDefault();
 
         taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0, TaskProgress.NEW);
@@ -25,20 +23,15 @@ public class Main {
         taskManager.updateTask(TaskType.SUBTASK, 3, "подзадача hello", "Выполнить работу", TaskProgress.DONE, 2);
         System.out.println();
         taskManager.printAllTasks();
-
-        //taskManager.deleteTasksById(TaskType.TASK, 1);
-
-
         System.out.println();
-        taskManager.printAllTasks();
 
+        taskManager.printAllTasks();
         System.out.println();
 
         taskManager.getTask(0);
         taskManager.getTask(1);
         taskManager.getEpic(2);
-taskManager.getSubtask(3);
-
+        taskManager.getSubtask(3);
 
         taskManager.getTask(0);
         taskManager.getTask(1);
@@ -55,8 +48,6 @@ taskManager.getSubtask(3);
 
         for (Task task : taskManager.getHistoryManager().getHistory()) {
             System.out.println(task);
-    }
-
-
+        }
     }
 }
