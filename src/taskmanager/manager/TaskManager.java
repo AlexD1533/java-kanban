@@ -22,15 +22,15 @@ public interface TaskManager {
 
     void printAllTasks();
 
-    void deleteAllTasks();
+    boolean deleteAllTasks();
 
     HistoryManager<Task> getHistoryManager();
 
-    void getTask(int id);
+    Task getTask(int id);
 
-    void getSubtask(int id);
+    Subtask getSubtask(int id);
 
-    void getEpic(int id);
+    Epic getEpic(int id);
 
     void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId);
 

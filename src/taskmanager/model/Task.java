@@ -1,5 +1,7 @@
 package taskmanager.model;
 
+import java.util.Objects;
+
 public class Task {
 
     private final int id;
@@ -27,6 +29,19 @@ public class Task {
         this.type = type;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return id == task.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
     public TaskProgress getStatus() {
         return status;
     }
@@ -35,5 +50,17 @@ public class Task {
     }
     public int getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public TaskType getType() {
+        return type;
     }
 }

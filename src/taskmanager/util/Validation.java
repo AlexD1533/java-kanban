@@ -44,6 +44,7 @@ public final class Validation {
         return true;
     }
 
+
     public static boolean subTaskValidationByEpic(int epicId, int id,  Map<Integer, Epic> epics) {
         if (!epics.get(epicId).getSubtasks().containsKey(id)) {
             System.out.println("Такой задачи не существует в эпике: " + epicId);

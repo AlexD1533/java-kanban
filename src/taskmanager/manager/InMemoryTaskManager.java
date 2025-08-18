@@ -19,39 +19,38 @@ public HistoryManager<Task> getHistoryManager() {
     return historyManager;
 }
 
-    @Override
-    public void getTask(int id) {
-        if (!Validation.taskValidation(id, tasks)) {
-            return;
-        }
-        System.out.println(tasks.get(id));
-        historyManager.addTask(tasks.get(id));
 
+    @Override
+    public Task getTask(int id) {
+        if (!Validation.taskValidation(id, tasks)) {
+            return null;
+        }
+
+        historyManager.addTask(tasks.get(id));
+        return tasks.get(id);
     }
     @Override
-    public void getSubtask(int id) {
+    public Subtask getSubtask(int id) {
 
         if (!Validation.subTaskValidation(id, epics)) {
-            return;
+            return null;
         }
         int epicId = getAllSubtasks(epics).get(id).getEpicId();
 
         if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
-            return;
+            return null;
         }
-        System.out.println(epics.get(epicId).getSubtasks().get(id));
         historyManager.addTask(epics.get(epicId).getSubtasks().get(id));
-
+return epics.get(epicId).getSubtasks().get(id);
     }
     @Override
-    public void getEpic(int id) {
+    public Epic getEpic(int id) {
 
         if (!Validation.epicValidation(id, epics)) {
-            return;
+            return null;
         }
-        System.out.println(epics.get(id));
         historyManager.addTask(epics.get(id));
-
+return epics.get(id);
     }
 
 
@@ -174,10 +173,12 @@ public HistoryManager<Task> getHistoryManager() {
     }
 
     @Override
-    public void deleteAllTasks() {
+    public boolean deleteAllTasks() {
         tasks.clear();
         epics.clear();
         System.out.println("Все задачи удалены");
+        counter = 0;
+        return tasks.isEmpty() && epics.isEmpty();
     }
 
 
@@ -194,7 +195,7 @@ public HistoryManager<Task> getHistoryManager() {
                 System.out.println("Задача обновлена: " + id + " " + name);
                 break;
             case TaskType.EPIC:
-                if (!Validation.epicValidation(epicId, epics)) {
+                if (!Validation.epicValidation(id, epics)) {
                     break;
                 }
                 TaskProgress defaultStatus = TaskProgress.NEW;
@@ -231,9 +232,10 @@ public HistoryManager<Task> getHistoryManager() {
         if (!Validation.subTasksEmptyValidationByEpic(id, epics)) {
             return;
         }
-
+        historyManager.addTask(epics.get(id));
         System.out.println(epics.get(id).getSubtasks().values());
     }
+
 @Override
     public void printTasksByType(TaskType type) {
         switch (type) {
