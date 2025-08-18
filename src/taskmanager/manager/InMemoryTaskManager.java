@@ -16,7 +16,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createTask(TaskType type, String name, String description, int epicId, TaskProgress status) {
-        if (!Validation.inputValidation(name, status)) {
+        if (!Validation.inputValidation(name)) {
             return;
         }
         int id = counter++;

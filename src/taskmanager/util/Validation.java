@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class Validation {
-    public static boolean inputValidation(String name, TaskProgress status) {
+    public static boolean inputValidation(String name) {
         if (name == null || name.isBlank()) {
             System.out.println("Имя не должно быть пустым");
             return false;
