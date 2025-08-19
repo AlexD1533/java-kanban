@@ -16,7 +16,7 @@ class ManagersTest {
     }
     @Test
     public void shouldReturnInitializedHistoryManager() {
-        HistoryManager<Task> historyManager = Managers.getDefaultHistory();
+        HistoryManager historyManager = Managers.getDefaultHistory();
         assertNotNull(historyManager, "Объект не может быть равен нулю");
         assertTrue(historyManager.getHistory().isEmpty(), "Список должен быть пустым");
 

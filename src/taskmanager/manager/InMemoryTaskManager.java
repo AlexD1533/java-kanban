@@ -5,14 +5,14 @@ import taskmanager.util.*;
 import taskmanager.model.Task;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
     private static int counter = 0;
     private static final Map<Integer, Task> tasks = new HashMap<>();
     private static final Map<Integer, Epic> epics = new HashMap<>();
-    private final HistoryManager<Task> historyManager = Managers.getDefaultHistory();
-
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
     public void createTask(TaskType type, String name, String description, int epicId, TaskProgress status) {
@@ -259,10 +259,13 @@ public class InMemoryTaskManager implements TaskManager {
             epics.get(epicId).setStatus(TaskProgress.IN_PROGRESS);
         }
     }
+
     @Override
-    public HistoryManager<Task> getHistoryManager() {
-        return historyManager;
+    public List<Task> getHistory() {
+       return historyManager.getHistory();
     }
+
+
     @Override
     public Task getTask(int id) {
         if (!Validation.taskValidation(id, tasks)) {

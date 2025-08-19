@@ -46,7 +46,7 @@ public class Main {
         taskManager.getSubtask(3);
         System.out.println("History");
 
-        for (Task task : taskManager.getHistoryManager().getHistory()) {
+        for (Task task : taskManager.getHistory()) {
             System.out.println(task);
         }
     }

@@ -5,19 +5,19 @@ import taskmanager.model.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InMemoryHistoryManager <T extends Task> implements HistoryManager<T>{
-  private final List<Task> history = new ArrayList<>(10);
+public class InMemoryHistoryManager implements HistoryManager {
+    private final List<Task> history = new ArrayList<>(10);
 
     @Override
-    public void addTask(T task) {
+    public void addTask(Task task) {
         if (history.size() == 10) {
             history.remove(0);
         }
-history.add(task);
+        history.add(task);
     }
 
     @Override
     public List<Task> getHistory() {
-return history;
+        return history;
     }
 }

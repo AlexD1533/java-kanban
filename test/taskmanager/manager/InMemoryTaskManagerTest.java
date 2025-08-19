@@ -71,13 +71,13 @@ class InMemoryTaskManagerTest {
         taskManager.getEpic(1);
         taskManager.getSubtask(2);
 
-        System.out.println(taskManager.getHistoryManager().getHistory());
+        System.out.println(taskManager.getHistory());
         Task oldTask = taskManager.getTask(0);
         taskManager.updateTask(TaskType.TASK, 0, "задача hello", "Выполнить работу", TaskProgress.IN_PROGRESS, 0);
         taskManager.getTask(0);
         System.out.println();
-        System.out.println(taskManager.getHistoryManager().getHistory());
-        assertEquals(oldTask.getName(), taskManager.getHistoryManager().getHistory().get(0).getName(),
+        System.out.println(taskManager.getHistory());
+        assertEquals(oldTask.getName(), taskManager.getHistory().get(0).getName(),
                 "Старая версия объекта не сохранилась");
 
         System.out.println();
@@ -87,8 +87,8 @@ class InMemoryTaskManagerTest {
         taskManager.updateTask(TaskType.EPIC, 1, "Эпик hello", "Выполнить работу", TaskProgress.IN_PROGRESS, 0);
         taskManager.getEpic(1);
         System.out.println();
-        System.out.println(taskManager.getHistoryManager().getHistory());
-        assertEquals(oldEpic.getName(), taskManager.getHistoryManager().getHistory().get(1).getName(),
+        System.out.println(taskManager.getHistory());
+        assertEquals(oldEpic.getName(), taskManager.getHistory().get(1).getName(),
                 "Старая версия объекта не сохранилась");
 
         Subtask oldSubtask = taskManager.getSubtask(2);
@@ -96,8 +96,8 @@ class InMemoryTaskManagerTest {
         taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача hello", "Выполнить работу", TaskProgress.IN_PROGRESS, 1);
         taskManager.getSubtask(2);
         System.out.println();
-        System.out.println(taskManager.getHistoryManager().getHistory());
-        assertEquals(oldSubtask.getName(), taskManager.getHistoryManager().getHistory().get(2).getName(),
+        System.out.println(taskManager.getHistory());
+        assertEquals(oldSubtask.getName(), taskManager.getHistory().get(2).getName(),
                 "Старая версия объекта не сохранилась");
     }
 

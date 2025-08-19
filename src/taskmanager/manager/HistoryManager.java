@@ -4,8 +4,8 @@ import taskmanager.model.Task;
 
 import java.util.List;
 
-public interface HistoryManager <T extends Task> {
+public interface HistoryManager  {
 
-    void addTask(T task);
+    void addTask(Task task);
     List<Task> getHistory();
 }

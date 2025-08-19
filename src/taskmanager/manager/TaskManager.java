@@ -3,6 +3,7 @@ package taskmanager.manager;
 import taskmanager.model.*;
 
 
+import java.util.List;
 import java.util.Map;
 
 public interface TaskManager {
@@ -21,8 +22,6 @@ public interface TaskManager {
 
     boolean deleteAllTasks();
 
-    HistoryManager<Task> getHistoryManager();
-
     Task getTask(int id);
 
     Subtask getSubtask(int id);
@@ -34,4 +33,5 @@ public interface TaskManager {
     void getEpicTasks(int id);
 
     void updateEpicTaskStatus(int epicId);
+    List<Task> getHistory();
 }
