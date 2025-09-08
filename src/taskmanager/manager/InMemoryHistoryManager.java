@@ -22,7 +22,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         size = 0;
     }
 
-
     @Override
     public void addTask(Task task) {
         linkLast(task);
@@ -33,7 +32,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         return getTasks();
     }
 
-
     @Override
     public void remove(int id) {
         Node<Task> current = cashe.get(id);
@@ -42,6 +40,10 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     public void removeNode(Node<Task> node) {
+        if (node == null) {
+            System.out.println("Объект не должен быть пустым");
+            return;
+        }
         if (node == head) {
             head = head.next;
             if (head != null) {
@@ -66,8 +68,11 @@ public class InMemoryHistoryManager implements HistoryManager {
             size--;
         }
 
-
     public void linkLast(Task data) {
+        if (data == null) {
+            System.out.println("Объект не должен быть пустым");
+            return;
+        }
         if (cashe.containsKey(data.getId())) {
             remove(data.getId());
         }
@@ -94,8 +99,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
         return result;
     }
-
-
 }
 
 

@@ -45,9 +45,7 @@ public class Task {
     public TaskProgress getStatus() {
         return status;
     }
-    public void setStatus(TaskProgress status) {
-        this.status = status;
-    }
+
     public int getId() {
         return id;
     }
@@ -55,7 +53,6 @@ public class Task {
     public String getName() {
         return name;
     }
-
     public String getDescription() {
         return description;
     }

@@ -1,19 +1,20 @@
 package taskmanager.model;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Epic extends Task {
-    private Map<Integer, Subtask> subtasks = new HashMap<>();
+    private Map<Integer, Subtask> subtasks;
 
-    public Epic(int id, String name, String description, TaskType type, TaskProgress status) {
+    public Epic(int id, String name, String description, TaskType type, TaskProgress status, Map<Integer, Subtask> subtasks) {
         super(id, name, description, type, status);
+        this.subtasks = subtasks;
     }
 
     public Map<Integer, Subtask> getSubtasks() {
-        return subtasks;
+        return Map.copyOf(subtasks);
     }
-    public void setSubtasks (Map<Integer, Subtask> subtasks) {
-        this.subtasks = subtasks;
-    }
+
 }

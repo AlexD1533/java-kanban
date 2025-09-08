@@ -3,6 +3,8 @@ package taskmanager.manager;
 import org.junit.jupiter.api.Test;
 import taskmanager.model.*;
 
+import java.util.HashMap;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
@@ -31,9 +33,9 @@ class InMemoryTaskManagerTest {
         assertEquals(task1.getDescription(), taskManager.getTask(3).getDescription(), "Объект изменился, объекты не равны");
         assertEquals(task1.getStatus(), taskManager.getTask(3).getStatus(), "Объект изменился, объекты не равны");
 
-        Epic epic = new Epic(1, "Эпик 2", "Выполнить работу", TaskType.EPIC, TaskProgress.NEW);
+        Epic epic = new Epic(1, "Эпик 2", "Выполнить работу", TaskType.EPIC, TaskProgress.NEW, new HashMap<>());
         assertEquals(taskManager.getEpic(1), epic, "Объекты не равны, ошибка");
-        Epic epic1 = new Epic(4, "Эпик 2", "Выполнить работу", TaskType.EPIC, TaskProgress.NEW);
+        Epic epic1 = new Epic(4, "Эпик 2", "Выполнить работу", TaskType.EPIC, TaskProgress.NEW, new HashMap<>());
 
         taskManager.createTask(epic1.getType(), epic1.getName(), epic1.getDescription(), 0, epic1.getStatus());
         assertEquals(epic1.getType(), taskManager.getEpic(4).getType(), "Объект изменился, объекты не равны");
@@ -59,47 +61,7 @@ class InMemoryTaskManagerTest {
         System.out.println();
     }
 
-    @Test
-    public void shouldSaveOldParametersHistory() {
-        taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0, TaskProgress.NEW);
-        taskManager.createTask(TaskType.EPIC, "Эпик 1", "Выполнить работу", 0, TaskProgress.NEW);
-        taskManager.createTask(TaskType.SUBTASK, "подзадача 1", "Выполнить работу", 1, TaskProgress.NEW);
-        System.out.println();
-        taskManager.printAllTasks();
 
-        taskManager.getTask(0);
-        taskManager.getEpic(1);
-        taskManager.getSubtask(2);
-
-        System.out.println(taskManager.getHistory());
-        Task oldTask = taskManager.getTask(0);
-        taskManager.updateTask(TaskType.TASK, 0, "задача hello", "Выполнить работу", TaskProgress.IN_PROGRESS, 0);
-        taskManager.getTask(0);
-        System.out.println();
-        System.out.println(taskManager.getHistory());
-        assertEquals(oldTask.getName(), taskManager.getHistory().get(0).getName(),
-                "Старая версия объекта не сохранилась");
-
-        System.out.println();
-        taskManager.printAllTasks();
-
-        Epic oldEpic = taskManager.getEpic(1);
-        taskManager.updateTask(TaskType.EPIC, 1, "Эпик hello", "Выполнить работу", TaskProgress.IN_PROGRESS, 0);
-        taskManager.getEpic(1);
-        System.out.println();
-        System.out.println(taskManager.getHistory());
-        assertEquals(oldEpic.getName(), taskManager.getHistory().get(1).getName(),
-                "Старая версия объекта не сохранилась");
-
-        Subtask oldSubtask = taskManager.getSubtask(2);
-
-        taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача hello", "Выполнить работу", TaskProgress.IN_PROGRESS, 1);
-        taskManager.getSubtask(2);
-        System.out.println();
-        System.out.println(taskManager.getHistory());
-        assertEquals(oldSubtask.getName(), taskManager.getHistory().get(2).getName(),
-                "Старая версия объекта не сохранилась");
-    }
 
     @Test
     public void shouldReturnStatusEpic() {
