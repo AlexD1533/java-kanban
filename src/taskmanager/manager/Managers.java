@@ -1,7 +1,5 @@
 package taskmanager.manager;
 
-import taskmanager.model.Task;
-
 public class Managers {
 
     public static TaskManager getDefault() {
