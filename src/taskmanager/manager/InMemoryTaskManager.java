@@ -4,7 +4,7 @@ import taskmanager.model.*;
 import taskmanager.util.*;
 import taskmanager.model.Task;
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,32 +45,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    @Override
-    public void deleteTasksByType(TaskType type) {
-        switch (type) {
-            case TaskType.TASK:
-                tasks.clear();
-                break;
-            case TaskType.EPIC:
 
-                epics.clear();
-                break;
-            case TaskType.SUBTASK:
-
-                if (epics.isEmpty()) {
-                    System.out.println("Задач такого типа нет");
-                    return;
-                }
-                for (Epic task : epics.values()) {
-                    task.getSubtasks().clear();
-                    updateEpicTaskStatus(task.getId());
-                }
-                break;
-            default:
-                System.out.println("Неправильный тип задачи");
-                break;
-        }
-    }
 
     @Override
     public void deleteTasksById(TaskType type, int id) {
@@ -81,12 +56,14 @@ public class InMemoryTaskManager implements TaskManager {
                     break;
                 }
                 tasks.remove(id);
+                historyManager.remove(id);
                 break;
             case TaskType.EPIC:
                 if (!Validation.epicValidation(id, epics)) {
                     break;
                 }
                 epics.remove(id);
+                historyManager.remove(id);
                 break;
             case TaskType.SUBTASK:
                 if (!Validation.subTaskValidation(id, epics)) {
@@ -97,6 +74,7 @@ public class InMemoryTaskManager implements TaskManager {
                     break;
                 }
                 epics.get(epicId).getSubtasks().remove(id);
+                historyManager.remove(id);
                 updateEpicTaskStatus(epicId);
                 break;
             default:

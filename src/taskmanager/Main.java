@@ -49,5 +49,14 @@ public class Main {
         for (Task task : taskManager.getHistory()) {
             System.out.println(task);
         }
+
+        taskManager.deleteTasksById(TaskType.TASK, 1);
+        System.out.println();
+
+        System.out.println("History after delete task");
+
+        for (Task task : taskManager.getHistory()) {
+            System.out.println(task);
+        }
     }
 }
