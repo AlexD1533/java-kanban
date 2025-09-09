@@ -1,7 +1,11 @@
 package taskmanager.manager;
 
 import org.junit.jupiter.api.Test;
-import taskmanager.model.*;
+import taskmanager.model.Task;
+import taskmanager.model.Epic;
+import taskmanager.model.Subtask;
+import taskmanager.model.TaskType;
+import taskmanager.model.TaskProgress;
 
 import java.util.HashMap;
 

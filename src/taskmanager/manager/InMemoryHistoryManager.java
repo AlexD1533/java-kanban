@@ -41,7 +41,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     public void removeNode(Node<Task> node) {
         if (node == null) {
-            System.out.println("Объект не должен быть пустым");
+
             return;
         }
         if (node == head) {
@@ -52,21 +52,19 @@ public class InMemoryHistoryManager implements HistoryManager {
             } else {
                 tail = null;
             }
-            }
-            else if (node == tail) {
-                tail = tail.prev;
-                if (tail != null) {
-                    tail.next = null;
-                } else {
-                    head = null;
-                }
+        } else if (node == tail) {
+            tail = tail.prev;
+            if (tail != null) {
+                tail.next = null;
             } else {
-                node.prev.next = node.next;
-                node.next.prev = node.prev;
-
+                head = null;
             }
-            size--;
+        } else {
+            node.prev.next = node.next;
+            node.next.prev = node.prev;
         }
+        size--;
+    }
 
     public void linkLast(Task data) {
         if (data == null) {

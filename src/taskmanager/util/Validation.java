@@ -1,7 +1,8 @@
 package taskmanager.util;
 
-import taskmanager.model.*;
-
+import taskmanager.model.Epic;
+import taskmanager.model.Task;
+import taskmanager.model.Subtask;
 
 import java.util.HashMap;
 import java.util.Map;

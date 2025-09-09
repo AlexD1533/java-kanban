@@ -1,6 +1,5 @@
 package taskmanager.manager;
 import org.junit.jupiter.api.Test;
-import taskmanager.model.Task;
 import taskmanager.model.TaskProgress;
 import taskmanager.model.TaskType;
 
