@@ -1,4 +1,5 @@
 package taskmanager.model;
+
 import java.util.Objects;
 
 public class Task {
@@ -52,6 +53,7 @@ public class Task {
     public String getName() {
         return name;
     }
+
     public String getDescription() {
         return description;
     }

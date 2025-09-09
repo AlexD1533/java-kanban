@@ -66,7 +66,6 @@ class InMemoryTaskManagerTest {
     }
 
 
-
     @Test
     public void shouldReturnStatusEpic() {
 

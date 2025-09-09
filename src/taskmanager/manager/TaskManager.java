@@ -31,5 +31,6 @@ public interface TaskManager {
     void getEpicTasks(int id);
 
     void updateEpicTaskStatus(int epicId);
+
     List<Task> getHistory();
 }

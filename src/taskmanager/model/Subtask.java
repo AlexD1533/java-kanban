@@ -1,4 +1,5 @@
 package taskmanager.model;
+
 public class Subtask extends Task {
     private final int epicId;
 
@@ -6,6 +7,7 @@ public class Subtask extends Task {
         super(id, name, description, type, status);
         this.epicId = epicId;
     }
+
     public int getEpicId() {
         return epicId;
     }

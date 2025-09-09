@@ -32,6 +32,7 @@ public final class Validation {
         }
         return true;
     }
+
     public static boolean subTaskValidation(int id, Map<Integer, Epic> epics) {
         Map<Integer, Subtask> currentSubtask = new HashMap<>();
         for (Epic task : epics.values()) {
@@ -44,7 +45,7 @@ public final class Validation {
         return true;
     }
 
-    public static boolean subTaskValidationByEpic(int epicId, int id,  Map<Integer, Epic> epics) {
+    public static boolean subTaskValidationByEpic(int epicId, int id, Map<Integer, Epic> epics) {
         if (!epics.get(epicId).getSubtasks().containsKey(id)) {
             System.out.println("Такой задачи не существует в эпике: " + epicId);
             return false;
@@ -52,10 +53,10 @@ public final class Validation {
         return true;
     }
 
-    public static boolean subTasksEmptyValidationByEpic(int id,  Map<Integer, Epic> epics) {
+    public static boolean subTasksEmptyValidationByEpic(int id, Map<Integer, Epic> epics) {
         if (epics.get(id).getSubtasks().isEmpty()) {
             System.out.println("Список подзадач в эпике: " + id + " пуст");
-         return false;
+            return false;
         }
         return true;
     }

@@ -5,7 +5,7 @@ public class Node<Task> {
     public Node<Task> next;
     public Node<Task> prev;
 
-    public Node (Task data) {
+    public Node(Task data) {
         this.data = data;
     }
 
