@@ -12,13 +12,13 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private Node<Task> head;
     private Node<Task> tail;
-    private final Map<Integer, Node<Task>> cashe;
-    int size;
+    private final Map<Integer, Node<Task>> cash;
+    private int size;
 
     public InMemoryHistoryManager() {
         head = null;
         tail = null;
-        cashe = new HashMap<>();
+        cash = new HashMap<>();
         size = 0;
     }
 
@@ -34,14 +34,14 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        Node<Task> current = cashe.get(id);
+        Node<Task> current = cash.get(id);
         removeNode(current);
-        cashe.remove(id);
+        cash.remove(id);
     }
 
     public void removeNode(Node<Task> node) {
         if (node == null) {
-
+            System.out.println("Объект не должен быть пустым");
             return;
         }
         if (node == head) {
@@ -71,7 +71,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             System.out.println("Объект не должен быть пустым");
             return;
         }
-        if (cashe.containsKey(data.getId())) {
+        if (cash.containsKey(data.getId())) {
             remove(data.getId());
         }
         Node<Task> newNode = new Node<>(data);
@@ -83,7 +83,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
         tail = newNode;
 
-        cashe.put(data.getId(), newNode);
+        cash.put(data.getId(), newNode);
         size++;
 
     }
