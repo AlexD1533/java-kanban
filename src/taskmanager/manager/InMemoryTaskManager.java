@@ -1,9 +1,13 @@
 package taskmanager.manager;
 
-import taskmanager.model.*;
-import taskmanager.util.*;
+import taskmanager.model.Epic;
 import taskmanager.model.Task;
+import taskmanager.model.Subtask;
+import taskmanager.model.TaskProgress;
+import taskmanager.model.TaskType;
+import taskmanager.util.Validation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,43 +31,23 @@ public class InMemoryTaskManager implements TaskManager {
                 break;
             case TaskType.EPIC:
                 TaskProgress defaultStatus = TaskProgress.NEW;
-                epics.put(id, new Epic(id, name, description, type, defaultStatus));
+                epics.put(id, new Epic(id, name, description, type, defaultStatus, new HashMap<>()));
                 System.out.println("Эпик создан: " + id + " " + name);
                 break;
             case TaskType.SUBTASK:
                 if (!Validation.epicValidation(epicId, epics)) {
                     break;
                 }
-                epics.get(epicId).getSubtasks().put(id, new Subtask(id, name, description, type, epicId, status));
+                Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
+
+                current.put(id, new Subtask(id, name, description, type, epicId, status));
+
+                epics.put(epicId, new Epic(epicId, epics.get(epicId).getName(),
+                        epics.get(epicId).getDescription(), epics.get(epicId).getType(),
+                        epics.get(epicId).getStatus(), current));
+
                 updateEpicTaskStatus(epicId);
                 System.out.println("Подзадача создана: " + id + " " + name + " в эпике №" + epicId);
-                break;
-            default:
-                System.out.println("Неправильный тип задачи");
-                break;
-        }
-    }
-
-    @Override
-    public void deleteTasksByType(TaskType type) {
-        switch (type) {
-            case TaskType.TASK:
-                tasks.clear();
-                break;
-            case TaskType.EPIC:
-
-                epics.clear();
-                break;
-            case TaskType.SUBTASK:
-
-                if (epics.isEmpty()) {
-                    System.out.println("Задач такого типа нет");
-                    return;
-                }
-                for (Epic task : epics.values()) {
-                    task.getSubtasks().clear();
-                    updateEpicTaskStatus(task.getId());
-                }
                 break;
             default:
                 System.out.println("Неправильный тип задачи");
@@ -80,12 +64,20 @@ public class InMemoryTaskManager implements TaskManager {
                     break;
                 }
                 tasks.remove(id);
+                historyManager.remove(id);
                 break;
             case TaskType.EPIC:
                 if (!Validation.epicValidation(id, epics)) {
                     break;
                 }
+                List<Integer> idEpicList = new ArrayList<>(epics.get(id).getSubtasks().keySet());
+
                 epics.remove(id);
+
+                historyManager.remove(id);
+                for (Integer key : idEpicList) {
+                    historyManager.remove(key);
+                }
                 break;
             case TaskType.SUBTASK:
                 if (!Validation.subTaskValidation(id, epics)) {
@@ -96,6 +88,7 @@ public class InMemoryTaskManager implements TaskManager {
                     break;
                 }
                 epics.get(epicId).getSubtasks().remove(id);
+                historyManager.remove(id);
                 updateEpicTaskStatus(epicId);
                 break;
             default:
@@ -106,7 +99,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void printAllTasks() {
-        if (tasks.isEmpty())  {
+        if (tasks.isEmpty()) {
             System.out.println("Задач нет");
         }
         if (epics.isEmpty()) {
@@ -152,10 +145,8 @@ public class InMemoryTaskManager implements TaskManager {
                 if (!Validation.epicValidation(id, epics)) {
                     break;
                 }
-                Map<Integer, Subtask> currentSubtasksList = epics.get(id).getSubtasks();
-                TaskProgress defaultStatus = TaskProgress.NEW;
-                epics.put(id, new Epic(id, name, description, type, defaultStatus));
-                epics.get(id).setSubtasks(currentSubtasksList);
+                epics.put(id, new Epic(id, name, description, type, status, epics.get(id).getSubtasks()));
+
                 System.out.println("Эпик обновлен: " + id + " " + name);
                 break;
             case TaskType.SUBTASK:
@@ -165,7 +156,15 @@ public class InMemoryTaskManager implements TaskManager {
                 if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
                     break;
                 }
-                epics.get(epicId).getSubtasks().put(id, new Subtask(id, name, description, type, epicId, status));
+
+                Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
+
+                current.put(id, new Subtask(id, name, description, type, epicId, status));
+
+                epics.put(epicId, new Epic(epicId, epics.get(epicId).getName(),
+                        epics.get(epicId).getDescription(), epics.get(epicId).getType(),
+                        epics.get(epicId).getStatus(), current));
+
                 System.out.println("Подзадача обновлена: " + id + " " + name + " в эпике: " + epicId);
                 updateEpicTaskStatus(epicId);
                 break;
@@ -192,7 +191,7 @@ public class InMemoryTaskManager implements TaskManager {
         System.out.println(epics.get(id).getSubtasks().values());
     }
 
-@Override
+    @Override
     public void printTasksByType(TaskType type) {
         switch (type) {
             case TaskType.TASK:
@@ -252,17 +251,23 @@ public class InMemoryTaskManager implements TaskManager {
         }
         if (newCount == epics.get(epicId).getSubtasks().values().size() ||
                 epics.get(epicId).getSubtasks().values().isEmpty()) {
-            epics.get(epicId).setStatus(TaskProgress.NEW);
+
+
+            updateTask(epics.get(epicId).getType(), epicId, epics.get(epicId).getName(),
+                    epics.get(epicId).getDescription(), TaskProgress.NEW, 0);
+
         } else if (doneCount == epics.get(epicId).getSubtasks().size()) {
-            epics.get(epicId).setStatus(TaskProgress.DONE);
+            updateTask(epics.get(epicId).getType(), epicId, epics.get(epicId).getName(),
+                    epics.get(epicId).getDescription(), TaskProgress.DONE, 0);
         } else {
-            epics.get(epicId).setStatus(TaskProgress.IN_PROGRESS);
+            updateTask(epics.get(epicId).getType(), epicId, epics.get(epicId).getName(),
+                    epics.get(epicId).getDescription(), TaskProgress.IN_PROGRESS, 0);
         }
     }
 
     @Override
     public List<Task> getHistory() {
-       return historyManager.getHistory();
+        return historyManager.getHistory();
     }
 
 
@@ -275,6 +280,7 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager.addTask(tasks.get(id));
         return tasks.get(id);
     }
+
     @Override
     public Subtask getSubtask(int id) {
 
@@ -289,6 +295,7 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager.addTask(epics.get(epicId).getSubtasks().get(id));
         return epics.get(epicId).getSubtasks().get(id);
     }
+
     @Override
     public Epic getEpic(int id) {
 
@@ -298,6 +305,8 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager.addTask(epics.get(id));
         return epics.get(id);
     }
+
+
 }
 
 

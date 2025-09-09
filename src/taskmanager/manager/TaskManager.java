@@ -8,13 +8,11 @@ import java.util.Map;
 
 public interface TaskManager {
 
+    void printTasksByType(TaskType type);
+
     Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics);
 
     void createTask(TaskType type, String name, String description, int epicId, TaskProgress status);
-
-    void printTasksByType(TaskType type);
-
-    void deleteTasksByType(TaskType type);
 
     void deleteTasksById(TaskType type, int id);
 
@@ -33,5 +31,6 @@ public interface TaskManager {
     void getEpicTasks(int id);
 
     void updateEpicTaskStatus(int epicId);
+
     List<Task> getHistory();
 }

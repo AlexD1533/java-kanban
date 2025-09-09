@@ -1,6 +1,8 @@
 import org.junit.jupiter.api.Test;
 import taskmanager.model.*;
 
+import java.util.HashMap;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TaskTest {
@@ -11,8 +13,8 @@ class TaskTest {
         Task task2 = new Task(1, "Задача 1", "Выполнить работу", TaskType.TASK, TaskProgress.NEW);
         assertEquals(task1, task2, "Задачи не совпадают");
 
-        Task task3 = new Epic(1, "Эпик 1", "Выполнить работу", TaskType.EPIC, TaskProgress.NEW);
-        Task task4 = new Epic(1, "Эпик 1", "Выполнить работу", TaskType.EPIC, TaskProgress.NEW);
+        Task task3 = new Epic(1, "Эпик 1", "Выполнить работу", TaskType.EPIC, TaskProgress.NEW, new HashMap<>());
+        Task task4 = new Epic(1, "Эпик 1", "Выполнить работу", TaskType.EPIC, TaskProgress.NEW, new HashMap<>());
         assertEquals(task3, task4, "Эпики не совпадают");
 
         Task task5 = new Subtask(1, "Подзадача 1", "Выполнить работу", TaskType.SUBTASK, 1, TaskProgress.NEW);
@@ -22,7 +24,7 @@ class TaskTest {
 
     @Test
     public void shouldNotCastEpicToSubtask() {
-        Epic epic1 = new Epic(1, "Эпик 1", "Выполнить работу", TaskType.EPIC, TaskProgress.NEW);
+        Epic epic1 = new Epic(1, "Эпик 1", "Выполнить работу", TaskType.EPIC, TaskProgress.NEW, new HashMap<>());
         assertThrows(ClassCastException.class, () -> {
             Subtask currentSubtask = (Subtask) (Task) epic1;
             epic1.getSubtasks().put(currentSubtask.getId(), currentSubtask);

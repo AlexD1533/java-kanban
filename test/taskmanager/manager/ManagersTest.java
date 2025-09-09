@@ -1,6 +1,6 @@
 package taskmanager.manager;
+
 import org.junit.jupiter.api.Test;
-import taskmanager.model.Task;
 import taskmanager.model.TaskProgress;
 import taskmanager.model.TaskType;
 
@@ -14,6 +14,7 @@ class ManagersTest {
         assertNotNull(manager, "Объект не может быть равен нулю");
         assertDoesNotThrow(() -> manager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0, TaskProgress.NEW));
     }
+
     @Test
     public void shouldReturnInitializedHistoryManager() {
         HistoryManager historyManager = Managers.getDefaultHistory();
