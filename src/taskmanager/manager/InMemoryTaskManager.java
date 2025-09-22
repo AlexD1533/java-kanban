@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static int counter = 0;
-    private static final Map<Integer, Task> tasks = new HashMap<>();
-    private static final Map<Integer, Epic> epics = new HashMap<>();
+    protected static int counter = 0;
+    protected static final Map<Integer, Task> tasks = new HashMap<>();
+    protected static final Map<Integer, Epic> epics = new HashMap<>();
     private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
