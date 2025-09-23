@@ -7,7 +7,7 @@ import java.util.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private final static File dataFile = new File("SavedDataCSV.txt");
+    private static final File dataFile = new File("SavedDataCSV.txt");
 
     public static void main(String[] args) {
         FileBackedTaskManager taskManager = new FileBackedTaskManager();
