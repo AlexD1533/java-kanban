@@ -2,9 +2,7 @@ package taskmanager.manager;
 
 import taskmanager.manager.exceptions.ManagerSaveException;
 import taskmanager.model.*;
-
 import java.io.*;
-import java.nio.file.Path;
 import java.util.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -80,16 +78,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             System.out.println("Объект равен нулю, преобразование в строку невозможно");
             return null;
         }
-        String record = "";
-        if (task instanceof Subtask) {
-            Subtask subtask = (Subtask) task;
+        String record;
+        if (task instanceof Subtask subtask) {
             record = String.format("%d,%s,%s,%s,%s,%s", subtask.getId(), subtask.getName(), subtask.getType(),
                     subtask.getStatus(), subtask.getDescription(), subtask.getEpicId());
-        } else if (task instanceof Epic) {
-            Epic epic = (Epic) task;
+        } else if (task instanceof Epic epic) {
             record = String.format("%d,%s,%s,%s,%s", epic.getId(), epic.getName(), epic.getType(),
                     epic.getStatus(), epic.getDescription());
-        } else if (task != null) {
+        } else {
             record = String.format("%d,%s,%s,%s,%s", task.getId(), task.getName(), task.getType(),
                     task.getStatus(), task.getDescription());
         }
@@ -112,26 +108,23 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         TaskProgress progress = TaskProgress.valueOf(res[3]);
         int id = Integer.parseInt(res[0]);
 
-        switch (type) {
-            case EPIC:
-                return new Epic(id, res[1], res[4], type,
-                        progress, new HashMap<>());
-            case TASK:
-                return new Task(id, res[1], res[4], type,
-                        progress);
-            case SUBTASK:
+        return switch (type) {
+            case EPIC -> new Epic(id, res[1], res[4], type,
+                    progress, new HashMap<>());
+            case TASK -> new Task(id, res[1], res[4], type,
+                    progress);
+            case SUBTASK -> {
                 int epicId = Integer.parseInt(res[5]);
-                return new Subtask(id, res[1], res[4], type,
+                yield new Subtask(id, res[1], res[4], type,
                         epicId,
                         progress);
-            default:
-                return null;
-        }
+            }
+        };
     }
 
     public void save() {
         try (
-                FileWriter fileWriter = new FileWriter(dataFile);
+                FileWriter fileWriter = new FileWriter(dataFile)
         ) {
 
             fileWriter.write("id,type,name,status,description,epic" + "\n");
@@ -151,17 +144,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         ) {
             List<Subtask> loadSubtasks = new ArrayList<>();
 
-            String header = reader.readLine();
+           reader.readLine();
             while (reader.ready()) {
                 String record = reader.readLine();
                 Task newTask = fromString(record);
 
-                if (newTask instanceof Epic) {
-                    Epic epic = (Epic) newTask;
+                if (newTask instanceof Epic epic) {
                     System.out.println("Загрузка эпика " + epic.getId());
                     addEpic(epic.getId(), epic);
-                } else if (newTask instanceof Subtask) {
-                    Subtask subtask = (Subtask) newTask;
+                } else if (newTask instanceof Subtask subtask) {
                     loadSubtasks.add(subtask);
                 } else {
                     System.out.println("Загрузка задачи " + newTask.getId());

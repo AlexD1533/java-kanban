@@ -4,21 +4,18 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import taskmanager.manager.exceptions.ManagerSaveException;
 import taskmanager.model.*;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FileBackedTaskManagerTest {
-    private final static File dataFile = new File("SavedDataCSV.txt");
+
 
     FileBackedTaskManager taskManager = new FileBackedTaskManager();
 
@@ -90,10 +87,10 @@ class FileBackedTaskManagerTest {
     }
 
 
-
     @Test
     @Order(3)
     public void saveAndLoadEmptyFile() {
+
         System.out.println();
         System.out.println("Удаляем все задачи");
         taskManager.deleteAllTasks();
@@ -104,40 +101,43 @@ class FileBackedTaskManagerTest {
         taskManager.printAllTasks();
         System.out.println();
         System.out.println("Загружаем содержимое файла");
-        taskManager.loadFromFile(dataFile);
+        taskManager.loadFromFile(new File("SavedDataCSV.txt"));
         taskManager.printAllTasks();
         assertEquals(taskManager.getAllTasks().size(), 0, "Ошибка загрузки пустого файла");
-
-    }
-        @Test
-        @Order(4)
-        public void saveAndLoadFiles() {
-            TreeMap<Integer, Task> mapBeforeDownload = new TreeMap<>();
-            TreeMap<Integer, Task> mapAfterDownload = new TreeMap<>();
-
-            System.out.println();
-            System.out.println("Удаляем все задачи");
-            taskManager.deleteAllTasks();
-            System.out.println("Сохраняем изменения в файл");
-            taskManager.save();
-
-            taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0, TaskProgress.NEW);
-            taskManager.createTask(TaskType.EPIC, "Эпик 1", "Выполнить работу", 0, TaskProgress.NEW);
-            taskManager.createTask(TaskType.SUBTASK, "подзадача 1", "Выполнить работу", 1, TaskProgress.NEW);
-            taskManager.printAllTasks();
-
-            System.out.println("Сохраняем изменения в файл");
-            taskManager.save();
-            mapBeforeDownload = taskManager.getAllTasks();
-            taskManager.loadFromFile(dataFile);
-            mapAfterDownload = taskManager.getAllTasks();
-            assertEquals(mapBeforeDownload, mapAfterDownload, "Ошибка сохранения и загрузки нескольких файлов. Данные после загрузки отличаются");
 
     }
 
     @Test
     @Order(4)
+    public void saveAndLoadFiles() {
+
+        TreeMap<Integer, Task> mapBeforeDownload = new TreeMap<>();
+        TreeMap<Integer, Task> mapAfterDownload = new TreeMap<>();
+
+        System.out.println();
+        System.out.println("Удаляем все задачи");
+        taskManager.deleteAllTasks();
+        System.out.println("Сохраняем изменения в файл");
+        taskManager.save();
+
+        taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0, TaskProgress.NEW);
+        taskManager.createTask(TaskType.EPIC, "Эпик 1", "Выполнить работу", 0, TaskProgress.NEW);
+        taskManager.createTask(TaskType.SUBTASK, "подзадача 1", "Выполнить работу", 1, TaskProgress.NEW);
+        taskManager.printAllTasks();
+
+        System.out.println("Сохраняем изменения в файл");
+        taskManager.save();
+        mapBeforeDownload = taskManager.getAllTasks();
+        taskManager.loadFromFile(new File("SavedDataCSV.txt"));
+        mapAfterDownload = taskManager.getAllTasks();
+        assertEquals(mapBeforeDownload, mapAfterDownload, "Ошибка сохранения и загрузки нескольких файлов. Данные после загрузки отличаются");
+
+    }
+
+    @Test
+    @Order(5)
     public void deleteTaskById() {
+
         System.out.println();
         System.out.println("Удаляем все задачи");
         taskManager.deleteAllTasks();
@@ -147,7 +147,6 @@ class FileBackedTaskManagerTest {
         taskManager.createTask(TaskType.SUBTASK, "подзадача 1", "Выполнить работу", 1, TaskProgress.NEW);
         taskManager.printAllTasks();
         System.out.println();
-
 
         taskManager.deleteTasksById(TaskType.TASK, 0);
         assertNull(taskManager.getAllTasks().get(0), "Объект должен быть удален");

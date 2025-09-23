@@ -19,31 +19,31 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     public Map<Integer, Task> getTasks() {
-return Map.copyOf(tasks);
+        return Map.copyOf(tasks);
     }
 
     public Map<Integer, Epic> getEpics() {
         return Map.copyOf(epics);
     }
 
-protected void addTask (int id, Task task) {
-    tasks.put(id, task);
-}
+    protected void addTask(int id, Task task) {
+        tasks.put(id, task);
+    }
 
-protected void addEpic (int id, Epic epic) {
-    epics.put(id, epic);
-}
+    protected void addEpic(int id, Epic epic) {
+        epics.put(id, epic);
+    }
 
-protected void addSubtask(int id, Subtask subtask) {
-    int epicId = subtask.getEpicId();
-    Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
-    current.put(id, subtask);
-    addEpic(epicId, new Epic(epicId, epics.get(epicId).getName(),
-            epics.get(epicId).getDescription(), epics.get(epicId).getType(),
-            epics.get(epicId).getStatus(), current));
-    updateEpicTaskStatus(epicId);
-    System.out.println("Подзадача создана: " + id + " " + subtask.getName() + " в эпике №" + epicId);
-}
+    protected void addSubtask(int id, Subtask subtask) {
+        int epicId = subtask.getEpicId();
+        Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
+        current.put(id, subtask);
+        addEpic(epicId, new Epic(epicId, epics.get(epicId).getName(),
+                epics.get(epicId).getDescription(), epics.get(epicId).getType(),
+                epics.get(epicId).getStatus(), current));
+        updateEpicTaskStatus(epicId);
+        System.out.println("Подзадача создана: " + id + " " + subtask.getName() + " в эпике №" + epicId);
+    }
 
     @Override
     public void createTask(TaskType type, String name, String description, int epicId, TaskProgress status) {
