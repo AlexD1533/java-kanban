@@ -106,7 +106,12 @@ protected void addSubtask(int id, Subtask subtask) {
                 if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
                     break;
                 }
-                epics.get(epicId).getSubtasks().remove(id);
+                Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
+                current.remove(id);
+                addEpic(epicId, new Epic(epicId, epics.get(epicId).getName(),
+                        epics.get(epicId).getDescription(), epics.get(epicId).getType(),
+                        epics.get(epicId).getStatus(), current));
+
                 historyManager.remove(id);
                 updateEpicTaskStatus(epicId);
                 break;
