@@ -13,10 +13,37 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-    protected static int counter = 0;
-    protected static final Map<Integer, Task> tasks = new HashMap<>();
-    protected static final Map<Integer, Epic> epics = new HashMap<>();
+    private static int counter = 0;
+    private static final Map<Integer, Task> tasks = new HashMap<>();
+    private static final Map<Integer, Epic> epics = new HashMap<>();
     private final HistoryManager historyManager = Managers.getDefaultHistory();
+
+    public Map<Integer, Task> getTasks() {
+return Map.copyOf(tasks);
+    }
+
+    public Map<Integer, Epic> getEpics() {
+        return Map.copyOf(epics);
+    }
+
+protected void addTask (int id, Task task) {
+    tasks.put(id, task);
+}
+
+protected void addEpic (int id, Epic epic) {
+    epics.put(id, epic);
+}
+
+protected void addSubtask(int id, Subtask subtask) {
+    int epicId = subtask.getEpicId();
+    Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
+    current.put(id, subtask);
+    addEpic(epicId, new Epic(epicId, epics.get(epicId).getName(),
+            epics.get(epicId).getDescription(), epics.get(epicId).getType(),
+            epics.get(epicId).getStatus(), current));
+    updateEpicTaskStatus(epicId);
+    System.out.println("Подзадача создана: " + id + " " + subtask.getName() + " в эпике №" + epicId);
+}
 
     @Override
     public void createTask(TaskType type, String name, String description, int epicId, TaskProgress status) {
@@ -26,7 +53,7 @@ public class InMemoryTaskManager implements TaskManager {
         int id = counter++;
         switch (type) {
             case TaskType.TASK:
-                tasks.put(id, new Task(id, name, description, type, status));
+                addTask(id, new Task(id, name, description, type, status));
                 System.out.println("Задача создана: " + id + " " + name);
                 break;
             case TaskType.EPIC:
@@ -38,16 +65,8 @@ public class InMemoryTaskManager implements TaskManager {
                 if (!Validation.epicValidation(epicId, epics)) {
                     break;
                 }
-                Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
+                addSubtask(id, new Subtask(id, name, description, type, epicId, status));
 
-                current.put(id, new Subtask(id, name, description, type, epicId, status));
-
-                epics.put(epicId, new Epic(epicId, epics.get(epicId).getName(),
-                        epics.get(epicId).getDescription(), epics.get(epicId).getType(),
-                        epics.get(epicId).getStatus(), current));
-
-                updateEpicTaskStatus(epicId);
-                System.out.println("Подзадача создана: " + id + " " + name + " в эпике №" + epicId);
                 break;
             default:
                 System.out.println("Неправильный тип задачи");
@@ -138,14 +157,14 @@ public class InMemoryTaskManager implements TaskManager {
                 if (!Validation.taskValidation(id, tasks)) {
                     break;
                 }
-                tasks.put(id, new Task(id, name, description, type, status));
+                addTask(id, new Task(id, name, description, type, status));
                 System.out.println("Задача обновлена: " + id + " " + name);
                 break;
             case TaskType.EPIC:
                 if (!Validation.epicValidation(id, epics)) {
                     break;
                 }
-                epics.put(id, new Epic(id, name, description, type, status, epics.get(id).getSubtasks()));
+                addEpic(id, new Epic(id, name, description, type, status, epics.get(id).getSubtasks()));
 
                 System.out.println("Эпик обновлен: " + id + " " + name);
                 break;
@@ -161,7 +180,7 @@ public class InMemoryTaskManager implements TaskManager {
 
                 current.put(id, new Subtask(id, name, description, type, epicId, status));
 
-                epics.put(epicId, new Epic(epicId, epics.get(epicId).getName(),
+                addEpic(epicId, new Epic(epicId, epics.get(epicId).getName(),
                         epics.get(epicId).getDescription(), epics.get(epicId).getType(),
                         epics.get(epicId).getStatus(), current));
 

@@ -6,10 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -37,13 +34,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     }
 
-    private void refreshCounter() {
-        if (getAllTasks().isEmpty()) {
-            counter = 0;
-        } else {
-            counter = getAllTasks().lastKey();
-        }
-    }
+
 
     public String toString(Task task) {
         String record = "";
@@ -113,6 +104,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (
                 BufferedReader reader = new BufferedReader(new FileReader("SavedDataCSV.txt"))
         ) {
+            List<Subtask> loadSubtasks = new ArrayList<>();
+
             String header = reader.readLine();
             while (reader.ready()) {
                 String record = reader.readLine();
@@ -120,17 +113,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
                  if (newTask instanceof Epic) {
                     Epic epic = (Epic) newTask;
-                    epics.put(epic.getId(), epic);
+                    addEpic(epic.getId(), epic);
                 } else if (newTask instanceof Subtask) {
-
                     Subtask subtask = (Subtask) newTask;
-                    if (epics.get(subtask.getEpicId()) == null) {
-                        System.out.println("SavedDataCSV.txt: Эпика для субтаска:" + subtask.getId() + " не существует.");
-                     } else {
-                        epics.get(subtask.getEpicId()).getSubtasks().put(subtask.getId(), subtask);
-                    }
                 } else {
-                    tasks.put(newTask.getId(), newTask);
+                    addTask(newTask.getId(), newTask);
+                }
+            }
+
+            for (Subtask subtask : loadSubtasks ) {
+                if (getEpics().get(subtask.getEpicId()) == null) {
+                    System.out.println("SavedDataCSV.txt: Эпика для субтаска:" + subtask.getId() + " не существует.");
+                } else {
+                    addSubtask(subtask.getId(), subtask);
                 }
             }
 
@@ -139,19 +134,26 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
+
+
+
+
+
+
+
     public TreeMap<Integer, Task> getAllTasks() {
         TreeMap<Integer, Task> res = new TreeMap<>();
 
-        if (tasks.isEmpty()) {
+        if (getTasks().isEmpty()) {
             System.out.println("Задач нет");
         }
-        if (epics.isEmpty()) {
+        if (getEpics().isEmpty()) {
             System.out.println("Эпиков нет");
         }
-        res.putAll(tasks);
-        res.putAll(epics);
+        res.putAll(getTasks());
+        res.putAll(getEpics());
 
-        for (Epic task : epics.values()) {
+        for (Epic task : getEpics().values()) {
             if (!task.getSubtasks().isEmpty()) {
                 res.putAll(task.getSubtasks());
             }
