@@ -15,7 +15,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args) {
-        FileBackedTaskManager taskManager = new FileBackedTaskManager(new File("SavedDataCSV.txt"));
+        FileBackedTaskManager taskManager = FileBackedTaskManager.loadFromFile(new File("SavedDataCSV.txt"));
         System.out.println("Поехали!");
 
 

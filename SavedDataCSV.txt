@@ -1,2 +1,1 @@
 id,type,name,status,description,epic
-0,Задача 1,TASK,NEW,Выполнить работу,no_epic_id
