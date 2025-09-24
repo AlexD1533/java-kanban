@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FileBackedTaskManagerTest {
 
 
-    FileBackedTaskManager taskManager = new FileBackedTaskManager();
+    FileBackedTaskManager taskManager = new FileBackedTaskManager(new File("SavedDataCSV.txt"));
 
     @Test
     @Order(1)

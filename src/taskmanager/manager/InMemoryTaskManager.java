@@ -22,19 +22,19 @@ public class InMemoryTaskManager implements TaskManager {
         return Map.copyOf(tasks);
     }
 
-    public Map<Integer, Epic> getEpics() {
+    public static Map<Integer, Epic> getEpics() {
         return Map.copyOf(epics);
     }
-
-    protected void addTask(int id, Task task) {
+@Override
+public void addTask(int id, Task task) {
         tasks.put(id, task);
     }
-
-    protected void addEpic(int id, Epic epic) {
+    @Override
+    public void addEpic(int id, Epic epic) {
         epics.put(id, epic);
     }
-
-    protected void addSubtask(int id, Subtask subtask) {
+    @Override
+    public void addSubtask(int id, Subtask subtask) {
         int epicId = subtask.getEpicId();
         Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
         current.put(id, subtask);

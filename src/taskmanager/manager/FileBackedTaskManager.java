@@ -2,15 +2,20 @@ package taskmanager.manager;
 
 import taskmanager.manager.exceptions.ManagerSaveException;
 import taskmanager.model.*;
+
 import java.io.*;
 import java.util.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private static final File dataFile = new File("SavedDataCSV.txt");
+    private final File dataFile;
+
+    public FileBackedTaskManager(File dataFile) {
+        this.dataFile = dataFile;
+    }
 
     public static void main(String[] args) {
-        FileBackedTaskManager taskManager = new FileBackedTaskManager();
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(new File("SavedDataCSV.txt"));
         System.out.println("Поехали!");
 
 
@@ -79,22 +84,23 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             return null;
         }
         String record;
+        String emptyLine = "no_epic_id";
         if (task instanceof Subtask subtask) {
             record = String.format("%d,%s,%s,%s,%s,%s", subtask.getId(), subtask.getName(), subtask.getType(),
                     subtask.getStatus(), subtask.getDescription(), subtask.getEpicId());
         } else if (task instanceof Epic epic) {
-            record = String.format("%d,%s,%s,%s,%s", epic.getId(), epic.getName(), epic.getType(),
-                    epic.getStatus(), epic.getDescription());
+            record = String.format("%d,%s,%s,%s,%s,%s", epic.getId(), epic.getName(), epic.getType(),
+                    epic.getStatus(), epic.getDescription(), emptyLine);
         } else {
-            record = String.format("%d,%s,%s,%s,%s", task.getId(), task.getName(), task.getType(),
-                    task.getStatus(), task.getDescription());
+            record = String.format("%d,%s,%s,%s,%s,%s", task.getId(), task.getName(), task.getType(),
+                    task.getStatus(), task.getDescription(), emptyLine);
         }
         return record;
     }
 
 
-    public Task fromString(String value) {
-        if (value.isEmpty() || value.isBlank()) {
+    public static Task fromString(String value) {
+        if (value.isBlank()) {
             System.out.println("SavedDataCSV.txt: файл пустой");
             return null;
         }
@@ -138,25 +144,26 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
 
-    public void loadFromFile(File file) {
+    public static FileBackedTaskManager loadFromFile(File file) {
+        FileBackedTaskManager manager = new FileBackedTaskManager(file);
         try (
                 BufferedReader reader = new BufferedReader(new FileReader(file))
         ) {
             List<Subtask> loadSubtasks = new ArrayList<>();
 
-           reader.readLine();
+            reader.readLine();
             while (reader.ready()) {
                 String record = reader.readLine();
                 Task newTask = fromString(record);
 
                 if (newTask instanceof Epic epic) {
                     System.out.println("Загрузка эпика " + epic.getId());
-                    addEpic(epic.getId(), epic);
+                    manager.addEpic(epic.getId(), epic);
                 } else if (newTask instanceof Subtask subtask) {
                     loadSubtasks.add(subtask);
                 } else {
                     System.out.println("Загрузка задачи " + newTask.getId());
-                    addTask(newTask.getId(), newTask);
+                    manager.addTask(newTask.getId(), newTask);
                 }
             }
 
@@ -165,7 +172,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     System.out.println("SavedDataCSV.txt: Эпика для субтаска:" + subtask.getId() + " не существует.");
                 } else {
                     System.out.println("Загрузка подзадачи " + subtask.getId());
-                    addSubtask(subtask.getId(), subtask);
+                    manager.addSubtask(subtask.getId(), subtask);
 
                 }
             }
@@ -175,8 +182,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             System.out.println("Ошибка загрузки из файла");
             e.printStackTrace();
         }
+        return manager;
     }
-
 
     public TreeMap<Integer, Task> getAllTasks() {
         TreeMap<Integer, Task> res = new TreeMap<>();
