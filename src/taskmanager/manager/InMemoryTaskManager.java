@@ -25,14 +25,17 @@ public class InMemoryTaskManager implements TaskManager {
     public static Map<Integer, Epic> getEpics() {
         return Map.copyOf(epics);
     }
-@Override
-public void addTask(int id, Task task) {
+
+    @Override
+    public void addTask(int id, Task task) {
         tasks.put(id, task);
     }
+
     @Override
     public void addEpic(int id, Epic epic) {
         epics.put(id, epic);
     }
+
     @Override
     public void addSubtask(int id, Subtask subtask) {
         int epicId = subtask.getEpicId();
