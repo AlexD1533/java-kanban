@@ -86,13 +86,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String record;
         String emptyLine = "no_epic_id";
         if (task instanceof Subtask subtask) {
-            record = String.format("%d,%s,%s,%s,%s,%s", subtask.getId(), subtask.getName(), subtask.getType(),
+            record = String.format("%d,%s,%s,%s,%s,%s", subtask.getId(), subtask.getType(), subtask.getName(),
                     subtask.getStatus(), subtask.getDescription(), subtask.getEpicId());
         } else if (task instanceof Epic epic) {
-            record = String.format("%d,%s,%s,%s,%s,%s", epic.getId(), epic.getName(), epic.getType(),
+            record = String.format("%d,%s,%s,%s,%s,%s", epic.getId(), epic.getType(), epic.getName(),
                     epic.getStatus(), epic.getDescription(), emptyLine);
         } else {
-            record = String.format("%d,%s,%s,%s,%s,%s", task.getId(), task.getName(), task.getType(),
+            record = String.format("%d,%s,%s,%s,%s,%s", task.getId(), task.getType(), task.getName(),
                     task.getStatus(), task.getDescription(), emptyLine);
         }
         return record;
@@ -110,18 +110,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             return null;
         }
 
-        TaskType type = TaskType.valueOf(res[2]);
+        TaskType type = TaskType.valueOf(res[1]);
         TaskProgress progress = TaskProgress.valueOf(res[3]);
         int id = Integer.parseInt(res[0]);
 
         return switch (type) {
-            case EPIC -> new Epic(id, res[1], res[4], type,
+            case EPIC -> new Epic(id, res[2], res[4], type,
                     progress, new HashMap<>());
-            case TASK -> new Task(id, res[1], res[4], type,
+            case TASK -> new Task(id, res[2], res[4], type,
                     progress);
             case SUBTASK -> {
                 int epicId = Integer.parseInt(res[5]);
-                yield new Subtask(id, res[1], res[4], type,
+                yield new Subtask(id, res[2], res[4], type,
                         epicId,
                         progress);
             }
