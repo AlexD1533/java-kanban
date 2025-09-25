@@ -12,6 +12,12 @@ public interface TaskManager {
 
     Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics);
 
+    void addTask(int id, Task task);
+
+    void addEpic(int id, Epic epic);
+
+    void addSubtask(int id, Subtask subtask);
+
     void createTask(TaskType type, String name, String description, int epicId, TaskProgress status);
 
     void deleteTasksById(TaskType type, int id);
