@@ -105,7 +105,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             return null;
         }
         String[] res = value.split(",");
-        if (res.length < 5) {
+        if (res.length < 6) {
             System.out.println("Ошибка формата строки");
             return null;
         }
@@ -220,6 +220,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public void printAllTasks() {
         super.printAllTasks();
+    }
+
+    @Override
+    public void addTask(int id, Task task) {
+        super.addTask(id, task);
+        save();
+    }
+
+    @Override
+    public void addEpic(int id, Epic epic) {
+        super.addEpic(id, epic);
+        save();
+    }
+
+    @Override
+    public void addSubtask(int id, Subtask subtask) {
+        super.addSubtask(id, subtask);
+        save();
     }
 
     @Override
