@@ -20,27 +20,36 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         System.out.println("Поехали!");
 
 
-        taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0, TaskProgress.NEW, "2005-12-12T00:00:00", 120, LocalDateTime.now().toString());
-        taskManager.createTask(TaskType.TASK, "Задача 2", "Выполнить работу", 0, TaskProgress.NEW, "2005-12-13T00:00:00", 120, LocalDateTime.now().toString());
+        taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0, TaskProgress.NEW, "2005-12-12T00:00", 120, LocalDateTime.now().toString());
+        taskManager.createTask(TaskType.TASK, "Задача 2", "Выполнить работу", 0, TaskProgress.NEW, "2005-12-13T00:00", 120, LocalDateTime.now().toString());
         System.out.println();
-        taskManager.createTask(TaskType.EPIC, "Эпик 1", "Выполнить работу", 0, TaskProgress.NEW, "2005-12-14T00:00:00", 120, LocalDateTime.now().toString());
+        taskManager.createTask(TaskType.EPIC, "Эпик 1", "Выполнить работу", 0, TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T00:00");
         System.out.println();
-        taskManager.createTask(TaskType.SUBTASK, "подзадача 1", "Выполнить работу", 2, TaskProgress.NEW, "2005-12-16T00:00:00", 120, LocalDateTime.now().toString());
-        taskManager.createTask(TaskType.SUBTASK, "подзадача 2", "Выполнить работу", 2, TaskProgress.NEW, "2005-12-17T00:00:00", 120, LocalDateTime.now().toString());
-        taskManager.createTask(TaskType.SUBTASK, "подзадача 3", "Выполнить работу", 2, TaskProgress.NEW, "2005-12-19T00:00:00", 120, LocalDateTime.now().toString());
+        taskManager.createTask(TaskType.SUBTASK, "подзадача 1", "Выполнить работу", 2, TaskProgress.NEW, "2005-12-16T00:00", 120, LocalDateTime.now().toString());
+        taskManager.createTask(TaskType.SUBTASK, "подзадача 2", "Выполнить работу", 2, TaskProgress.NEW, "2005-12-17T00:00", 120, LocalDateTime.now().toString());
+        taskManager.createTask(TaskType.SUBTASK, "подзадача 3", "Выполнить работу", 2, TaskProgress.NEW, "2005-12-19T00:00", 120, LocalDateTime.now().toString());
+
+        taskManager.createTask(TaskType.SUBTASK, "подзадача 3", "Выполнить работу", 2, TaskProgress.NEW, "2005-12-18T22:00", 120, LocalDateTime.now().toString());
 
         taskManager.printAllTasks();
         System.out.println();
 
-       taskManager.updateTask(TaskType.TASK, 1, "подзадача hello", "Выполнить работу", TaskProgress.IN_PROGRESS, 0, "2005-12-13T00:00:00", 120, LocalDateTime.now().toString());
-       taskManager.updateTask(TaskType.SUBTASK, 3, "подзадача hello", "Выполнить работу", TaskProgress.DONE, 2, "2005-12-13T00:00:00", 120, LocalDateTime.now().toString());
-        taskManager.createTask(TaskType.SUBTASK, "подзадача 15", "Выполнить работу", 2, TaskProgress.NEW, "2005-12-11T00:12:00", 120, LocalDateTime.now().toString());
+      /* taskManager.updateTask(TaskType.TASK, 1, "подзадача hello", "Выполнить работу", TaskProgress.IN_PROGRESS, 0, "2005-12-13T00:00", 120, LocalDateTime.now().toString());
+       taskManager.updateTask(TaskType.SUBTASK, 3, "подзадача hello", "Выполнить работу", TaskProgress.DONE, 2, "2005-12-13T00:00", 120, LocalDateTime.now().toString());
+        taskManager.createTask(TaskType.SUBTASK, "подзадача 15", "Выполнить работу", 2, TaskProgress.NEW, "2005-12-16T00:00", 120, LocalDateTime.now().toString());
+        taskManager.createTask(TaskType.TASK, "Задача 21", "Выполнить работу", 0, TaskProgress.NEW, "2005-12-16T03:00", 120, LocalDateTime.now().toString());
 
         System.out.println();
         taskManager.printAllTasks();
         System.out.println();
 
         taskManager.getEpicTasks(2);
+
+        System.out.println();
+        for(Task task : taskManager.getPrioritizedTasks()) {
+            System.out.println(task);
+        }
+*/
 /*
         taskManager.getTask(0);
         taskManager.getTask(1);
@@ -79,6 +88,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
 */
     }
+
+
 
 
 
@@ -193,26 +204,10 @@ String endTime = res[8];
         return manager;
     }
 
+    @Override
     public TreeMap<Integer, Task> getAllTasks() {
-        TreeMap<Integer, Task> res = new TreeMap<>();
-
-        if (getTasks().isEmpty()) {
-            System.out.println("Задач нет");
-        }
-        if (getEpics().isEmpty()) {
-            System.out.println("Эпиков нет");
-        }
-        res.putAll(getTasks());
-        res.putAll(getEpics());
-
-        for (Epic task : getEpics().values()) {
-            if (!task.getSubtasks().isEmpty()) {
-                res.putAll(task.getSubtasks());
-            }
-        }
-        return res;
+        return super.getAllTasks();
     }
-
 
     @Override
     public void deleteTasksById(TaskType type, int id) {
