@@ -16,9 +16,7 @@ public class Task {
     private final LocalDateTime startTime;
     private final Duration duration;
 
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
+
 
     public long getDuration() {
         return duration.toMinutes();
@@ -33,7 +31,8 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 ", startTime=" + startTime +
-                ", duration=" + duration + "minutes" +
+                ", duration=" + duration.toMinutes() + " minutes" +
+                ", endTime=" + this.getEndTime() +
                 '}';
     }
 
@@ -45,6 +44,9 @@ public class Task {
         this.type = type;
         this.startTime = LocalDateTime.parse(startTime);
 this.duration = Duration.ofMinutes(minutesForDuration);
+    }
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 
     public LocalDateTime getEndTime() {

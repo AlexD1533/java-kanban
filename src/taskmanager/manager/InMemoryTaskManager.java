@@ -39,10 +39,10 @@ public class InMemoryTaskManager implements TaskManager {
                 .max(LocalDateTime::compareTo);
     }
     @Override
-    public void updateEpic (int epicId) {
+    public void updateEpic(int epicId) {
         LocalDateTime newStartTime = updateEpicStartTime(epicId).orElseThrow(() ->
                 new RuntimeException("Минимальное время старта равно нулю. Ошибка"));
-        LocalDateTime newEndTime = updateEpicStartTime(epicId).orElseThrow(() ->
+        LocalDateTime newEndTime = updateEpicEndTime(epicId).orElseThrow(() ->
                 new RuntimeException("Максимальное время завершения равно нулю. Ошибка"));
 
         updateTask(TaskType.EPIC, epicId, epics.get(epicId).getName(),
@@ -174,7 +174,9 @@ public class InMemoryTaskManager implements TaskManager {
         }
         for (Epic task : epics.values()) {
             if (!task.getSubtasks().isEmpty()) {
-                System.out.println(task.getSubtasks().values());
+                for (Task taskValue : task.getSubtasks().values()) {
+                    System.out.println(taskValue);
+                }
             }
         }
     }
@@ -246,7 +248,9 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         historyManager.addTask(epics.get(id));
-        System.out.println(epics.get(id).getSubtasks().values());
+        for(Task taskValue : epics.get(id).getSubtasks().values()) {
+            System.out.println(taskValue);
+        }
     }
 
     @Override
