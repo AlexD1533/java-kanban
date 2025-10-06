@@ -7,10 +7,8 @@ import taskmanager.model.TaskProgress;
 import taskmanager.model.TaskType;
 import taskmanager.util.Validation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private static int counter = 0;
@@ -24,6 +22,33 @@ public class InMemoryTaskManager implements TaskManager {
 
     public static Map<Integer, Epic> getEpics() {
         return Map.copyOf(epics);
+    }
+
+
+    @Override
+    public Optional<LocalDateTime> updateEpicStartTime(int epicId) {
+        return epics.get(epicId).getSubtasks().values().stream()
+                .map(Task::getStartTime)
+                .min(LocalDateTime::compareTo);
+
+    }
+    @Override
+    public Optional<LocalDateTime> updateEpicEndTime(int epicId) {
+        return epics.get(epicId).getSubtasks().values().stream()
+                .map(Task::getEndTime)
+                .max(LocalDateTime::compareTo);
+    }
+    @Override
+    public void updateEpic (int epicId) {
+        LocalDateTime newStartTime = updateEpicStartTime(epicId).orElseThrow(() ->
+                new RuntimeException("Минимальное время старта равно нулю. Ошибка"));
+        LocalDateTime newEndTime = updateEpicStartTime(epicId).orElseThrow(() ->
+                new RuntimeException("Максимальное время завершения равно нулю. Ошибка"));
+
+        updateTask(TaskType.EPIC, epicId, epics.get(epicId).getName(),
+                epics.get(epicId).getDescription(),
+                epics.get(epicId).getStatus(), 0, newStartTime.toString(),
+                epics.get(epicId).getDuration(), newEndTime.toString());
     }
 
     @Override
@@ -43,32 +68,36 @@ public class InMemoryTaskManager implements TaskManager {
         current.put(id, subtask);
         addEpic(epicId, new Epic(epicId, epics.get(epicId).getName(),
                 epics.get(epicId).getDescription(), epics.get(epicId).getType(),
-                epics.get(epicId).getStatus(), current));
+                epics.get(epicId).getStatus(), current, epics.get(epicId).getStartTime().toString(),
+                epics.get(epicId).getDuration(), epics.get(epicId).getEndTime().toString()));
         updateEpicTaskStatus(epicId);
+        updateEpic(epicId);
         System.out.println("Подзадача создана: " + id + " " + subtask.getName() + " в эпике №" + epicId);
     }
 
     @Override
-    public void createTask(TaskType type, String name, String description, int epicId, TaskProgress status) {
+    public void createTask(TaskType type, String name, String description, int epicId, TaskProgress status, String startTime, long minutesForDuration, String endTime) {
         if (!Validation.inputValidation(name)) {
             return;
         }
         int id = counter++;
         switch (type) {
             case TaskType.TASK:
-                addTask(id, new Task(id, name, description, type, status));
+                addTask(id, new Task(id, name, description, type, status, startTime, minutesForDuration));
                 System.out.println("Задача создана: " + id + " " + name);
                 break;
             case TaskType.EPIC:
                 TaskProgress defaultStatus = TaskProgress.NEW;
-                epics.put(id, new Epic(id, name, description, type, defaultStatus, new HashMap<>()));
+                epics.put(id, new Epic(id, name, description, type, defaultStatus, new HashMap<>(), startTime, minutesForDuration, endTime));
                 System.out.println("Эпик создан: " + id + " " + name);
                 break;
             case TaskType.SUBTASK:
                 if (!Validation.epicValidation(epicId, epics)) {
                     break;
                 }
-                addSubtask(id, new Subtask(id, name, description, type, epicId, status));
+
+                addSubtask(id, new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration));
+
 
                 break;
             default:
@@ -113,7 +142,8 @@ public class InMemoryTaskManager implements TaskManager {
                 current.remove(id);
                 addEpic(epicId, new Epic(epicId, epics.get(epicId).getName(),
                         epics.get(epicId).getDescription(), epics.get(epicId).getType(),
-                        epics.get(epicId).getStatus(), current));
+                        epics.get(epicId).getStatus(), current, epics.get(epicId).getStartTime().toString(),
+                        epics.get(epicId).getDuration(), epics.get(epicId).getEndTime().toString()));
 
                 historyManager.remove(id);
                 updateEpicTaskStatus(epicId);
@@ -159,20 +189,20 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId) {
+    public void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId, String startTime, long minutesForDuration, String endTime) {
         switch (type) {
             case TaskType.TASK:
                 if (!Validation.taskValidation(id, tasks)) {
                     break;
                 }
-                addTask(id, new Task(id, name, description, type, status));
+                addTask(id, new Task(id, name, description, type, status, startTime, minutesForDuration));
                 System.out.println("Задача обновлена: " + id + " " + name);
                 break;
             case TaskType.EPIC:
                 if (!Validation.epicValidation(id, epics)) {
                     break;
                 }
-                addEpic(id, new Epic(id, name, description, type, status, epics.get(id).getSubtasks()));
+                addEpic(id, new Epic(id, name, description, type, status, epics.get(id).getSubtasks(), startTime, minutesForDuration, endTime));
 
                 System.out.println("Эпик обновлен: " + id + " " + name);
                 break;
@@ -186,11 +216,12 @@ public class InMemoryTaskManager implements TaskManager {
 
                 Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
 
-                current.put(id, new Subtask(id, name, description, type, epicId, status));
+                current.put(id, new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration));
 
                 addEpic(epicId, new Epic(epicId, epics.get(epicId).getName(),
                         epics.get(epicId).getDescription(), epics.get(epicId).getType(),
-                        epics.get(epicId).getStatus(), current));
+                        epics.get(epicId).getStatus(), current, epics.get(epicId).getStartTime().toString(),
+                        epics.get(epicId).getDuration(), epics.get(epicId).getEndTime().toString()));
 
                 System.out.println("Подзадача обновлена: " + id + " " + name + " в эпике: " + epicId);
                 updateEpicTaskStatus(epicId);
@@ -281,14 +312,17 @@ public class InMemoryTaskManager implements TaskManager {
 
 
             updateTask(epics.get(epicId).getType(), epicId, epics.get(epicId).getName(),
-                    epics.get(epicId).getDescription(), TaskProgress.NEW, 0);
+                    epics.get(epicId).getDescription(), TaskProgress.NEW, 0, epics.get(epicId).getStartTime().toString(),
+                    epics.get(epicId).getDuration(), epics.get(epicId).getEndTime().toString());
 
         } else if (doneCount == epics.get(epicId).getSubtasks().size()) {
             updateTask(epics.get(epicId).getType(), epicId, epics.get(epicId).getName(),
-                    epics.get(epicId).getDescription(), TaskProgress.DONE, 0);
+                    epics.get(epicId).getDescription(), TaskProgress.DONE, 0, epics.get(epicId).getStartTime().toString(),
+                    epics.get(epicId).getDuration(), epics.get(epicId).getEndTime().toString());
         } else {
             updateTask(epics.get(epicId).getType(), epicId, epics.get(epicId).getName(),
-                    epics.get(epicId).getDescription(), TaskProgress.IN_PROGRESS, 0);
+                    epics.get(epicId).getDescription(), TaskProgress.IN_PROGRESS, 0, epics.get(epicId).getStartTime().toString(),
+                    epics.get(epicId).getDuration(), epics.get(epicId).getEndTime().toString());
         }
     }
 

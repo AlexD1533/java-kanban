@@ -3,10 +3,15 @@ package taskmanager.manager;
 import taskmanager.model.*;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface TaskManager {
+  Optional<LocalDateTime> updateEpicEndTime(int epicId);
+     Optional<LocalDateTime> updateEpicStartTime(int epicId);
+   void updateEpic (int epicId);
 
     void printTasksByType(TaskType type);
 
@@ -18,7 +23,8 @@ public interface TaskManager {
 
     void addSubtask(int id, Subtask subtask);
 
-    void createTask(TaskType type, String name, String description, int epicId, TaskProgress status);
+
+    void createTask(TaskType type, String name, String description, int epicId, TaskProgress status, String startTime, long minutesForDuration, String endTime);
 
     void deleteTasksById(TaskType type, int id);
 
@@ -32,7 +38,9 @@ public interface TaskManager {
 
     Epic getEpic(int id);
 
-    void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId);
+
+
+    void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId, String startTime, long minutesForDuration, String endTime);
 
     void getEpicTasks(int id);
 

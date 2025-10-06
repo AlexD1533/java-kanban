@@ -16,7 +16,15 @@ public class Task {
     private final LocalDateTime startTime;
     private final Duration duration;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public long getDuration() {
+        return duration.toMinutes();
+    }
+
+  //  private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
     @Override
     public String toString() {
         return type + "{" +
@@ -29,13 +37,13 @@ public class Task {
                 '}';
     }
 
-    public Task(int id, String name, String description, TaskType type, TaskProgress status, String startTime, int minutesForDuration) {
+    public Task(int id, String name, String description, TaskType type, TaskProgress status, String startTime, long minutesForDuration) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
         this.type = type;
-        this.startTime = LocalDateTime.parse(startTime, formatter);
+        this.startTime = LocalDateTime.parse(startTime);
 this.duration = Duration.ofMinutes(minutesForDuration);
     }
 
