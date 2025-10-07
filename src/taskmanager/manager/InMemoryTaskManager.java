@@ -28,37 +28,35 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
 
-
-@Override
+    @Override
     public Optional<Boolean> checkIntersections(Task t1) {
-return Optional.of(getPrioritizedTasks().stream()
+        return Optional.of(getPrioritizedTasks().stream()
                 .filter(task -> task.getId() != t1.getId())
                 .filter(task -> !(task instanceof Epic))
-        .anyMatch(task -> t1.getStartTime().isBefore(task.getEndTime()) && t1.getEndTime().isAfter(task.getStartTime())));
+                .anyMatch(task -> t1.getStartTime().isBefore(task.getEndTime()) && t1.getEndTime().isAfter(task.getStartTime())));
     }
 
-@Override
+    @Override
     public TreeSet<Task> getPrioritizedTasks() {
         TreeSet<Task> result = new TreeSet<>(
                 Comparator.comparing(Task::getStartTime)
                         .thenComparing(Task::getId));
-      result.addAll(getAllTasks().values());
+        result.addAll(getAllTasks().values());
         return result;
     }
 
-@Override
+    @Override
     public TreeMap<Integer, Task> getAllTasks() {
         return allTasksStream()
                 .collect(Collectors.toMap(
-                       Task::getId,
+                        Task::getId,
                         task -> task,
                         (t1, t2) -> t1,
                         TreeMap::new
                 ));
-
-
     }
-@Override
+
+    @Override
     public Stream<Task> allTasksStream() {
         return Stream.of(
                 tasks.values().stream(),
@@ -75,13 +73,13 @@ return Optional.of(getPrioritizedTasks().stream()
                 .min(LocalDateTime::compareTo);
 
     }
+
     @Override
     public Optional<LocalDateTime> updateEpicEndTime(Map<Integer, Subtask> map) {
         return map.values().stream()
                 .map(Task::getEndTime)
                 .max(LocalDateTime::compareTo);
     }
-
 
     @Override
     public void addTask(int id, Task task) {
@@ -97,14 +95,8 @@ return Optional.of(getPrioritizedTasks().stream()
 
     @Override
     public void addEpic(int id, Epic epic) {
-        boolean isIntersection = checkIntersections(epic).orElseThrow(() ->
-                new RuntimeException("Ошибка сравнения пересечений"));
-
-            epics.put(id, epic);
-
-            System.out.println("Эпик создан: " + id + " ");
-
-
+        epics.put(id, epic);
+        System.out.println("Эпик создан: " + id + " ");
     }
 
     @Override
@@ -245,8 +237,6 @@ return Optional.of(getPrioritizedTasks().stream()
                 }
                 System.out.println("Обновление эпика: " + id + " " + name);
                 addEpic(id, new Epic(id, name, description, type, status, epics.get(id).getSubtasks(), startTime, minutesForDuration, endTime));
-
-
                 break;
             case TaskType.SUBTASK:
                 if (!Validation.epicValidation(epicId, epics)) {
@@ -256,16 +246,15 @@ return Optional.of(getPrioritizedTasks().stream()
                     break;
                 }
 
-
                 addSubtask(id, new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration));
                 System.out.println("Обновление подзадачи: " + id + " " + name + " в эпике: " + epicId);
-
                 break;
             default:
                 System.out.println("Неправильный тип задачи");
                 break;
         }
     }
+
     @Override
     public void getEpicTasks(int id) {
 
@@ -284,18 +273,17 @@ return Optional.of(getPrioritizedTasks().stream()
     }
 
 
-
     @Override
     public Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics) {
-      return allTasksStream()
-              .filter(t -> t instanceof Subtask)
-              .map(t ->(Subtask) t)
-              .collect(Collectors.toMap(
-                      Subtask::getId,
-                      task -> task,
-                      (t1, t2) -> t1,
-                      HashMap::new
-              ));
+        return allTasksStream()
+                .filter(t -> t instanceof Subtask)
+                .map(t -> (Subtask) t)
+                .collect(Collectors.toMap(
+                        Subtask::getId,
+                        task -> task,
+                        (t1, t2) -> t1,
+                        HashMap::new
+                ));
 
     }
 
@@ -315,7 +303,6 @@ return Optional.of(getPrioritizedTasks().stream()
         }
         if (newCount == epics.get(epicId).getSubtasks().values().size() ||
                 epics.get(epicId).getSubtasks().values().isEmpty()) {
-
 
             updateTask(epics.get(epicId).getType(), epicId, epics.get(epicId).getName(),
                     epics.get(epicId).getDescription(), TaskProgress.NEW, 0, epics.get(epicId).getStartTime().toString(),
