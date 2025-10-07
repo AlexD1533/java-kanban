@@ -9,6 +9,8 @@ import taskmanager.util.Validation;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InMemoryTaskManager implements TaskManager {
     private static int counter = 0;
@@ -26,9 +28,10 @@ public class InMemoryTaskManager implements TaskManager {
 
 
 
-
+@Override
     public Optional<Boolean> checkIntersections(Task t1) {
 return Optional.of(getPrioritizedTasks().stream()
+                .filter(task -> task.getId() != t1.getId())
         .anyMatch(task -> t1.getStartTime().isBefore(task.getEndTime()) && t1.getEndTime().isAfter(task.getStartTime())));
     }
 
@@ -43,25 +46,24 @@ return Optional.of(getPrioritizedTasks().stream()
 
 @Override
     public TreeMap<Integer, Task> getAllTasks() {
-        TreeMap<Integer, Task> res = new TreeMap<>();
+        return allTasksStream()
+                .collect(Collectors.toMap(
+                       Task::getId,
+                        task -> task,
+                        (t1, t2) -> t1,
+                        TreeMap::new
+                ));
 
-        if (getTasks().isEmpty()) {
-            System.out.println("Задач нет");
-        }
-        if (getEpics().isEmpty()) {
-            System.out.println("Эпиков нет");
-        }
-        res.putAll(getTasks());
-        res.putAll(getEpics());
 
-        for (Epic task : getEpics().values()) {
-            if (!task.getSubtasks().isEmpty()) {
-                res.putAll(task.getSubtasks());
-            }
-        }
-        return res;
     }
 
+    public Stream<Task> allTasksStream() {
+        return Stream.of(
+                tasks.values().stream(),
+                epics.values().stream(),
+                epics.values().stream().flatMap(e -> e.getSubtasks().values().stream())
+        ).flatMap(s -> s);
+    }
 
 
     @Override
@@ -79,10 +81,10 @@ return Optional.of(getPrioritizedTasks().stream()
     }
     @Override
     public void updateEpic(int epicId) {
-        LocalDateTime newStartTime = updateEpicStartTime(epicId).orElseThrow(() ->
-                new RuntimeException("Минимальное время старта равно нулю. Ошибка"));
-        LocalDateTime newEndTime = updateEpicEndTime(epicId).orElseThrow(() ->
-                new RuntimeException("Максимальное время завершения равно нулю. Ошибка"));
+        LocalDateTime newStartTime = updateEpicStartTime(epicId).orElse(epics.get(epicId).getStartTime());
+
+
+        LocalDateTime newEndTime = updateEpicEndTime(epicId).orElse(epics.get(epicId).getStartTime());
 
         updateTask(TaskType.EPIC, epicId, epics.get(epicId).getName(),
                 epics.get(epicId).getDescription(),
@@ -216,29 +218,7 @@ return Optional.of(getPrioritizedTasks().stream()
 
     @Override
     public void printAllTasks() {
-        if (tasks.isEmpty()) {
-            System.out.println("Задач нет");
-        }
-        if (epics.isEmpty()) {
-            System.out.println("Эпиков нет");
-        }
-        for (Task task : tasks.values()) {
-            if (task != null) {
-                System.out.println(task);
-            }
-        }
-        for (Epic task : epics.values()) {
-            if (task != null) {
-                System.out.println(task);
-            }
-        }
-        for (Epic task : epics.values()) {
-            if (!task.getSubtasks().isEmpty()) {
-                for (Task taskValue : task.getSubtasks().values()) {
-                    System.out.println(taskValue);
-                }
-            }
-        }
+        allTasksStream().forEach(System.out::println);
     }
 
     @Override
@@ -312,53 +292,23 @@ return Optional.of(getPrioritizedTasks().stream()
             return;
         }
         historyManager.addTask(epics.get(id));
-        for(Task taskValue : epics.get(id).getSubtasks().values()) {
-            System.out.println(taskValue);
-        }
+        epics.get(id).getSubtasks().values().forEach(System.out::println);
     }
 
-    @Override
-    public void printTasksByType(TaskType type) {
-        switch (type) {
-            case TaskType.TASK:
-                if (tasks.isEmpty()) {
-                    System.out.println("Задач такого типа нет");
-                    return;
-                }
-                for (Task task : tasks.values()) {
-                    System.out.println(task);
-                }
-                break;
 
-            case TaskType.EPIC:
-                if (epics.isEmpty()) {
-                    System.out.println("Задач такого типа нет");
-                    return;
-                }
-                for (Epic task : epics.values()) {
-                    System.out.println(task);
-                }
-                break;
-            case TaskType.SUBTASK:
-                if (epics.isEmpty()) {
-                    System.out.println("Задач такого типа нет");
-                    return;
-                }
-                System.out.println(getAllSubtasks(epics));
-                break;
-            default:
-                System.out.println("Неправильный тип задачи");
-                break;
-        }
-    }
 
     @Override
     public Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics) {
-        Map<Integer, Subtask> currentSubtask = new HashMap<>();
-        for (Epic task : epics.values()) {
-            currentSubtask.putAll(task.getSubtasks());
-        }
-        return currentSubtask;
+      return allTasksStream()
+              .filter(t -> t instanceof Subtask)
+              .map(t ->(Subtask) t)
+              .collect(Collectors.toMap(
+                      Subtask::getId,
+                      task -> task,
+                      (t1, t2) -> t1,
+                      HashMap::new
+              ));
+
     }
 
     @Override

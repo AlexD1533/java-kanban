@@ -9,14 +9,15 @@ import java.util.*;
 public interface TaskManager {
   Optional<LocalDateTime> updateEpicEndTime(int epicId);
 
- TreeSet<Task> getPrioritizedTasks();
+    Optional<Boolean> checkIntersections(Task t1);
+
+    TreeSet<Task> getPrioritizedTasks();
 
  TreeMap<Integer, Task> getAllTasks();
 
  Optional<LocalDateTime> updateEpicStartTime(int epicId);
    void updateEpic (int epicId);
 
-    void printTasksByType(TaskType type);
 
     Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics);
 

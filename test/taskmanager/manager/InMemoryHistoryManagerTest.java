@@ -11,8 +11,8 @@ class InMemoryHistoryManagerTest {
 
     HistoryManager testHistory = Managers.getDefaultHistory();
 
-    Task task1 = new Task(1, "Задача 1", "Выполнить работу", TaskType.TASK, TaskProgress.NEW);
-    Task task2 = new Task(1, "Задача Новая версия", "Выполнить работу", TaskType.TASK, TaskProgress.NEW);
+    Task task1 = new Task(1, "Задача 1", "Выполнить работу", TaskType.TASK, TaskProgress.NEW, "2005-12-12T00:00", 120);
+    Task task2 = new Task(1, "Задача Новая версия", "Выполнить работу", TaskType.TASK, TaskProgress.NEW, "2005-12-12T00:00", 120);
 
     @Test
     public void checkAddTask() {
@@ -34,7 +34,7 @@ class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldBeCheckDeleteAndCreateNullObject() {
-        Task task1 = new Task(1, "Задача 1", "Выполнить работу", TaskType.TASK, TaskProgress.NEW);
+        Task task1 = new Task(1, "Задача 1", "Выполнить работу", TaskType.TASK, TaskProgress.NEW, "2005-12-12T00:00", 120);
         testHistory.addTask(task1);
         System.out.println(testHistory.getHistory());
         testHistory.remove(1);

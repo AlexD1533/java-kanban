@@ -254,6 +254,8 @@ String endTime = res[8];
         save();
     }
 
-
-
+    @Override
+    public Subtask getSubtask(int id) {
+        return super.getSubtask(id);
+    }
 }
