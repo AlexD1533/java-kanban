@@ -24,7 +24,6 @@ protected abstract T createTaskManager();
         TaskManager taskManager = createTaskManager();
         taskManager.deleteAllTasks();
 
-        // Создаем задачи с временными параметрами
         taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0,
                 TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
         taskManager.createTask(TaskType.EPIC, "Эпик 1", "Выполнить работу", 0,
@@ -39,7 +38,6 @@ protected abstract T createTaskManager();
         assertNotNull(taskManager.getEpic(1), "Такого объекта не существует");
         assertNotNull(taskManager.getSubtask(2), "Такого объекта не существует");
 
-        // Создаем задачи для сравнения с временными параметрами
         Task task = new Task(0, "Задача 1", "Выполнить работу", TaskType.TASK,
                 TaskProgress.NEW, "2005-12-12T00:00", 120);
         Task task1 = new Task(3, "Задача 2", "Выполнить работу", TaskType.TASK,
@@ -57,7 +55,7 @@ protected abstract T createTaskManager();
         assertEquals(task1.getDescription(), taskManager.getTask(3).getDescription(), "Описания не совпадают");
         assertEquals(task1.getStatus(), taskManager.getTask(3).getStatus(), "Статусы не совпадают");
 
-        // Epic с подзадачами
+
         HashMap<Integer, Subtask> subtasks = new HashMap<>();
         Subtask existingSubtask = new Subtask(2, "подзадача 1", "Выполнить работу",
                 TaskType.SUBTASK, 1, TaskProgress.NEW, "2005-12-14T00:00", 120);
@@ -116,14 +114,33 @@ protected abstract T createTaskManager();
                 TaskProgress.NEW, "2005-12-13T00:00", 120, "2005-12-13T02:00");
         taskManager.createTask(TaskType.SUBTASK, "подзадача 1", "Выполнить работу", 1,
                 TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T02:00");
+        taskManager.createTask(TaskType.SUBTASK, "подзадача 2", "Выполнить работу", 1,
+                TaskProgress.NEW, "2005-12-15T00:00", 120, "2005-12-15T02:00");
+
+        taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача hello", "Выполнить работу",
+                TaskProgress.NEW, 1, "2005-12-14T00:00", 120, "2005-12-14T02:00");
+        taskManager.updateTask(TaskType.SUBTASK, 3, "Подзадача hello", "Выполнить работу",
+                TaskProgress.NEW, 1, "2005-12-15T00:00", 120, "2005-12-15T02:00");
+        assertEquals(TaskProgress.NEW, taskManager.getEpic(1).getStatus(), "Статусы не совпадают");
+
 
         taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача hello", "Выполнить работу",
                 TaskProgress.IN_PROGRESS, 1, "2005-12-14T00:00", 120, "2005-12-14T02:00");
+        taskManager.updateTask(TaskType.SUBTASK, 3, "Подзадача hello", "Выполнить работу",
+                TaskProgress.IN_PROGRESS, 1, "2005-12-15T00:00", 120, "2005-12-15T02:00");
         assertEquals(TaskProgress.IN_PROGRESS, taskManager.getEpic(1).getStatus(), "Статусы не совпадают");
 
         taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача hello", "Выполнить работу",
                 TaskProgress.DONE, 1, "2005-12-14T00:00", 120, "2005-12-14T02:00");
+        taskManager.updateTask(TaskType.SUBTASK, 3, "Подзадача hello", "Выполнить работу",
+                TaskProgress.DONE, 1, "2005-12-15T00:00", 120, "2005-12-15T02:00");
         assertEquals(TaskProgress.DONE, taskManager.getEpic(1).getStatus(), "Статусы не совпадают");
+
+        taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача hello", "Выполнить работу",
+                TaskProgress.NEW, 1, "2005-12-14T00:00", 120, "2005-12-14T02:00");
+        taskManager.updateTask(TaskType.SUBTASK, 3, "Подзадача hello", "Выполнить работу",
+                TaskProgress.DONE, 1, "2005-12-15T00:00", 120, "2005-12-15T02:00");
+        assertEquals(TaskProgress.IN_PROGRESS, taskManager.getEpic(1).getStatus(), "Статусы не совпадают");
     }
 
     @Test
@@ -172,41 +189,9 @@ protected abstract T createTaskManager();
         assertNull(taskManager.getEpic(1), "Эпик не удален");
     }
 
+
     @Test
     @Order(5)
-    public void testUpdateEpicStatusWithMultipleSubtasks() {
-        TaskManager taskManager = createTaskManager();
-        taskManager.deleteAllTasks();
-
-        taskManager.createTask(TaskType.EPIC, "Эпик", "Описание", 0,
-                TaskProgress.NEW, "2005-12-13T00:00", 120, "2005-12-13T02:00");
-
-        // Создаем несколько подзадач
-        taskManager.createTask(TaskType.SUBTASK, "Подзадача 1", "Описание", 0,
-                TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T02:00");
-        taskManager.createTask(TaskType.SUBTASK, "Подзадача 2", "Описание", 0,
-                TaskProgress.NEW, "2005-12-15T00:00", 120, "2005-12-15T02:00");
-
-        taskManager.printAllTasks();
-
-        // Все подзадачи NEW -> эпик NEW
-        assertEquals(TaskProgress.NEW, taskManager.getEpic(0).getStatus(), "Эпик должен быть NEW");
-
-        // Одна подзадача IN_PROGRESS -> эпик IN_PROGRESS
-        taskManager.updateTask(TaskType.SUBTASK, 1, "Подзадача 1", "Описание",
-                TaskProgress.IN_PROGRESS, 0, "2005-12-14T00:00", 120, "2005-12-14T02:00");
-        assertEquals(TaskProgress.IN_PROGRESS, taskManager.getEpic(0).getStatus(), "Эпик должен быть IN_PROGRESS");
-
-        // Все подзадачи DONE -> эпик DONE
-        taskManager.updateTask(TaskType.SUBTASK, 1, "Подзадача 1", "Описание",
-                TaskProgress.DONE, 0, "2005-12-14T00:00", 120, "2005-12-14T02:00");
-        taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача 2", "Описание",
-                TaskProgress.DONE, 0, "2005-12-15T00:00", 120, "2005-12-15T02:00");
-        assertEquals(TaskProgress.DONE, taskManager.getEpic(0).getStatus(), "Эпик должен быть DONE");
-    }
-
-    @Test
-    @Order(6)
     public void testHistory() {
         TaskManager taskManager = createTaskManager();
         taskManager.deleteAllTasks();
@@ -216,10 +201,9 @@ protected abstract T createTaskManager();
         taskManager.createTask(TaskType.EPIC, "Эпик 1", "Описание", 0,
                 TaskProgress.NEW, "2005-12-13T00:00", 120, "2005-12-13T02:00");
 
-        // Получаем задачи для добавления в историю
         taskManager.getTask(0);
         taskManager.getEpic(1);
-        taskManager.getTask(0); // дублирование для проверки
+        taskManager.getTask(0);
 
         List<Task> history = taskManager.getHistory();
         assertEquals(2, history.size(), "История должна содержать 2 уникальные задачи");
@@ -228,12 +212,11 @@ protected abstract T createTaskManager();
     }
 
     @Test
-    @Order(7)
+    @Order(6)
     public void testGetPrioritizedTasks() {
         TaskManager taskManager = createTaskManager();
         taskManager.deleteAllTasks();
 
-        // Создаем задачи в разном порядке времени
         taskManager.createTask(TaskType.TASK, "Задача 2", "Описание", 0,
                 TaskProgress.NEW, "2005-12-13T00:00", 120, "2005-12-13T02:00");
         taskManager.createTask(TaskType.TASK, "Задача 1", "Описание", 0,
@@ -244,9 +227,64 @@ protected abstract T createTaskManager();
         TreeSet<Task> prioritized = taskManager.getPrioritizedTasks();
         assertEquals(3, prioritized.size(), "Неверное количество приоритетных задач");
 
-        // Проверяем сортировку по времени начала
         assertEquals("Задача 1", prioritized.getFirst().getName(), "Первая задача должна быть Задача 1");
-
         assertEquals("Задача 3", prioritized.getLast().getName(), "Третья задача должна быть Задача 3");
     }
-}
+
+    @Test
+    @Order(7)
+    public void testIntersections() {
+
+            System.out.println("пересечения");
+            TaskManager taskManager = createTaskManager();
+            taskManager.deleteAllTasks();
+
+            taskManager.createTask(TaskType.TASK, "Задача 1", "Описание", 0,
+                    TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
+            assertNotNull(taskManager.getTask(0), "Первая задача должна быть создана");
+
+            taskManager.createTask(TaskType.EPIC, "Эпик 1", "Описание", 0,
+                    TaskProgress.NEW, "2005-12-13T00:00", 120, "2005-12-13T02:00");
+            assertNotNull(taskManager.getEpic(1), "Эпик должен быть создан");
+
+            taskManager.createTask(TaskType.SUBTASK, "Подзадача 1", "Описание", 1,
+                    TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-14T02:00");
+            assertNull(taskManager.getSubtask(2), "Пересечение с существующей задачей, объект должен быть равен null");
+
+
+            taskManager.createTask(TaskType.SUBTASK, "Подзадача 2", "Описание", 1,
+                    TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T02:00");
+            assertNotNull(taskManager.getSubtask(3), "Объекты не пересекаются, не должен быть равен null");
+
+            taskManager.createTask(TaskType.TASK, "Задача 2", "Описание", 0,
+                    TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
+            assertNull(taskManager.getTask(3), "Полное пересечение, объект должен быть равен null");
+
+            taskManager.createTask(TaskType.TASK, "Задача 3", "Описание", 0,
+                    TaskProgress.NEW, "2005-12-12T01:00", 60, "2005-12-12T02:00");
+            assertNull(taskManager.getTask(4), "Пересечение по началу, объект должен быть равен null");
+
+
+            taskManager.createTask(TaskType.TASK, "Задача 4", "Описание", 0,
+                    TaskProgress.NEW, "2005-12-11T23:00", 120, "2005-12-12T01:00");
+            assertNull(taskManager.getTask(5), "Пересечение по концу, объект должен быть равен null");
+
+
+            taskManager.createTask(TaskType.TASK, "Задача 5", "Описание", 0,
+                    TaskProgress.NEW, "2005-12-11T22:00", 60, "2005-12-11T23:00");
+            assertNotNull(taskManager.getTask(7), "Задача до существующей, не должна быть null");
+
+            taskManager.createTask(TaskType.TASK, "Задача 6", "Описание", 0,
+                    TaskProgress.NEW, "2005-12-12T03:00", 60, "2005-12-12T04:00");
+            assertNotNull(taskManager.getTask(7), "Задача после существующей, не должна быть null");
+
+            taskManager.createTask(TaskType.EPIC, "Эпик 2", "Описание", 0,
+                    TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
+            assertNotNull(taskManager.getEpic(9), "Эпик может быть создан в любое время, не должен быть null");
+
+            System.out.println("Тест пересечений завершен");
+        }
+
+    }
+
+

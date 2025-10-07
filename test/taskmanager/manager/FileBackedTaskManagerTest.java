@@ -4,6 +4,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import taskmanager.manager.exceptions.ManagerSaveException;
 import taskmanager.model.*;
 
 import java.io.File;
@@ -16,11 +17,21 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FileBackedTaskManagerTest {
 
-    FileBackedTaskManager taskManager = new FileBackedTaskManager(new File("SavedDataCSV.txt"));
-
     @Test
-    @Order(3)
+    @Order(1)
+    public void saveAndLoadNonExistentDir() {
+File nonExistenFile = new File("asd/asd/asd/asd.scv");
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(nonExistenFile);
+
+        assertThrows(ManagerSaveException.class, () ->
+                taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0,
+                TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00"), "Должно быть выброшено исключение");
+
+    }
+    @Test
+    @Order(2)
     public void saveAndLoadEmptyFile() {
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(new File("SavedDataCSV.txt"));
         System.out.println();
         System.out.println("Удаляем все задачи");
         taskManager.deleteAllTasks();
@@ -37,8 +48,9 @@ class FileBackedTaskManagerTest {
     }
 
     @Test
-    @Order(4)
+    @Order(3)
     public void saveAndLoadFiles() {
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(new File("SavedDataCSV.txt"));
         TreeMap<Integer, Task> mapBeforeDownload = new TreeMap<>();
         TreeMap<Integer, Task> mapAfterDownload = new TreeMap<>();
 
