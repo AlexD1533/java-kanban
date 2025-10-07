@@ -5,9 +5,10 @@ import taskmanager.model.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Stream;
 
 public interface TaskManager {
-  Optional<LocalDateTime> updateEpicEndTime(int epicId);
+
 
     Optional<Boolean> checkIntersections(Task t1);
 
@@ -15,8 +16,14 @@ public interface TaskManager {
 
  TreeMap<Integer, Task> getAllTasks();
 
- Optional<LocalDateTime> updateEpicStartTime(int epicId);
-   void updateEpic (int epicId);
+
+ Stream<Task> allTasksStream();
+
+ Optional<LocalDateTime> updateEpicStartTime(Map<Integer, Subtask> map);
+
+ Optional<LocalDateTime> updateEpicEndTime(Map<Integer, Subtask> map);
+
+
 
 
     Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics);

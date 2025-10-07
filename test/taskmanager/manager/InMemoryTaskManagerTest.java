@@ -192,14 +192,14 @@ class InMemoryTaskManagerTest {
         assertEquals(TaskProgress.NEW, taskManager.getEpic(0).getStatus(), "Эпик должен быть NEW");
 
         // Одна подзадача IN_PROGRESS -> эпик IN_PROGRESS
-        taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача 1", "Описание",
+        taskManager.updateTask(TaskType.SUBTASK, 1, "Подзадача 1", "Описание",
                 TaskProgress.IN_PROGRESS, 0, "2005-12-14T00:00", 120, "2005-12-14T02:00");
         assertEquals(TaskProgress.IN_PROGRESS, taskManager.getEpic(0).getStatus(), "Эпик должен быть IN_PROGRESS");
 
         // Все подзадачи DONE -> эпик DONE
-        taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача 1", "Описание",
+        taskManager.updateTask(TaskType.SUBTASK, 1, "Подзадача 1", "Описание",
                 TaskProgress.DONE, 0, "2005-12-14T00:00", 120, "2005-12-14T02:00");
-        taskManager.updateTask(TaskType.SUBTASK, 1, "Подзадача 2", "Описание",
+        taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача 2", "Описание",
                 TaskProgress.DONE, 0, "2005-12-15T00:00", 120, "2005-12-15T02:00");
         assertEquals(TaskProgress.DONE, taskManager.getEpic(0).getStatus(), "Эпик должен быть DONE");
     }

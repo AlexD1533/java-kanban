@@ -16,8 +16,6 @@ public class Task {
     private final LocalDateTime startTime;
     private final Duration duration;
 
-
-
     public long getDuration() {
         return duration.toMinutes();
     }

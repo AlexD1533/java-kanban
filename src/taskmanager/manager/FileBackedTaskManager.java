@@ -19,6 +19,23 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
          FileBackedTaskManager taskManager = FileBackedTaskManager.loadFromFile(new File("SavedDataCSV.txt"));
         System.out.println("Поехали!");
 
+        taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0, TaskProgress.NEW, "2005-12-12T00:00", 60, LocalDateTime.now().toString());
+        taskManager.createTask(TaskType.EPIC, "Эпик 1", "Выполнить работу", 0, TaskProgress.NEW, "2005-12-12T00:00", 0, "2005-12-12T00:00");
+        taskManager.createTask(TaskType.SUBTASK, "подзадача 1", "Выполнить работу", 1, TaskProgress.NEW, "2005-12-12T01:00", 120, LocalDateTime.now().toString());
+        taskManager.createTask(TaskType.SUBTASK, "подзадача 111", "Выполнить работу", 1, TaskProgress.NEW, "2005-12-12T03:01", 120, LocalDateTime.now().toString());
+        taskManager.updateTask(TaskType.SUBTASK, 2, "подзадача hello", "Выполнить работу", TaskProgress.DONE, 1, "2005-12-13T00:00", 120, LocalDateTime.now().toString());
+        taskManager.updateTask(TaskType.SUBTASK, 2, "подзадача hello", "Выполнить работу", TaskProgress.DONE, 1, "2005-12-13T00:00", 120, LocalDateTime.now().toString());
+        taskManager.updateTask(TaskType.SUBTASK, 3, "подзадача hello", "Выполнить работу", TaskProgress.DONE, 1, "2005-12-12T03:01", 120, LocalDateTime.now().toString());
+
+
+        taskManager.printAllTasks();
+
+
+
+
+
+
+/*
 
         taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0, TaskProgress.NEW, "2005-12-12T00:00", 120, LocalDateTime.now().toString());
         taskManager.createTask(TaskType.TASK, "Задача 2", "Выполнить работу", 0, TaskProgress.NEW, "2005-12-13T00:00", 120, LocalDateTime.now().toString());
@@ -32,7 +49,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         taskManager.createTask(TaskType.SUBTASK, "подзадача 3", "Выполнить работу", 2, TaskProgress.NEW, "2005-12-18T22:00", 120, LocalDateTime.now().toString());
 
         taskManager.printAllTasks();
-        System.out.println();
+        System.out.println();*/
 
       /* taskManager.updateTask(TaskType.TASK, 1, "подзадача hello", "Выполнить работу", TaskProgress.IN_PROGRESS, 0, "2005-12-13T00:00", 120, LocalDateTime.now().toString());
        taskManager.updateTask(TaskType.SUBTASK, 3, "подзадача hello", "Выполнить работу", TaskProgress.DONE, 2, "2005-12-13T00:00", 120, LocalDateTime.now().toString());

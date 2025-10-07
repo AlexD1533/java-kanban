@@ -7,6 +7,7 @@ import taskmanager.model.TaskProgress;
 import taskmanager.model.TaskType;
 import taskmanager.util.Validation;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,6 +33,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Optional<Boolean> checkIntersections(Task t1) {
 return Optional.of(getPrioritizedTasks().stream()
                 .filter(task -> task.getId() != t1.getId())
+                .filter(task -> !(task instanceof Epic))
         .anyMatch(task -> t1.getStartTime().isBefore(task.getEndTime()) && t1.getEndTime().isAfter(task.getStartTime())));
     }
 
@@ -56,7 +58,7 @@ return Optional.of(getPrioritizedTasks().stream()
 
 
     }
-
+@Override
     public Stream<Task> allTasksStream() {
         return Stream.of(
                 tasks.values().stream(),
@@ -67,30 +69,19 @@ return Optional.of(getPrioritizedTasks().stream()
 
 
     @Override
-    public Optional<LocalDateTime> updateEpicStartTime(int epicId) {
-        return epics.get(epicId).getSubtasks().values().stream()
+    public Optional<LocalDateTime> updateEpicStartTime(Map<Integer, Subtask> map) {
+        return map.values().stream()
                 .map(Task::getStartTime)
                 .min(LocalDateTime::compareTo);
 
     }
     @Override
-    public Optional<LocalDateTime> updateEpicEndTime(int epicId) {
-        return epics.get(epicId).getSubtasks().values().stream()
+    public Optional<LocalDateTime> updateEpicEndTime(Map<Integer, Subtask> map) {
+        return map.values().stream()
                 .map(Task::getEndTime)
                 .max(LocalDateTime::compareTo);
     }
-    @Override
-    public void updateEpic(int epicId) {
-        LocalDateTime newStartTime = updateEpicStartTime(epicId).orElse(epics.get(epicId).getStartTime());
 
-
-        LocalDateTime newEndTime = updateEpicEndTime(epicId).orElse(epics.get(epicId).getStartTime());
-
-        updateTask(TaskType.EPIC, epicId, epics.get(epicId).getName(),
-                epics.get(epicId).getDescription(),
-                epics.get(epicId).getStatus(), 0, newStartTime.toString(),
-                epics.get(epicId).getDuration(), newEndTime.toString());
-    }
 
     @Override
     public void addTask(int id, Task task) {
@@ -108,12 +99,12 @@ return Optional.of(getPrioritizedTasks().stream()
     public void addEpic(int id, Epic epic) {
         boolean isIntersection = checkIntersections(epic).orElseThrow(() ->
                 new RuntimeException("Ошибка сравнения пересечений"));
-        if (!isIntersection) {
+
             epics.put(id, epic);
+
             System.out.println("Эпик создан: " + id + " ");
-        } else {
-            System.out.println("Нельзя добавить задачу, задачи пересекаются по времени");
-        }
+
+
     }
 
     @Override
@@ -125,12 +116,16 @@ return Optional.of(getPrioritizedTasks().stream()
             int epicId = subtask.getEpicId();
             Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
             current.put(id, subtask);
+            LocalDateTime newStartTime = updateEpicStartTime(current).orElse(epics.get(epicId).getStartTime());
+            LocalDateTime newEndTime = updateEpicEndTime(current).orElse(epics.get(epicId).getEndTime());
+            Duration allTaskDuration = Duration.between(newStartTime, newEndTime);
+
             addEpic(epicId, new Epic(epicId, epics.get(epicId).getName(),
                     epics.get(epicId).getDescription(), epics.get(epicId).getType(),
-                    epics.get(epicId).getStatus(), current, epics.get(epicId).getStartTime().toString(),
-                    epics.get(epicId).getDuration(), epics.get(epicId).getEndTime().toString()));
+                    epics.get(epicId).getStatus(), current, newStartTime.toString(),
+                    allTaskDuration.toMinutes(), newEndTime.toString()));
             updateEpicTaskStatus(epicId);
-            updateEpic(epicId);
+
             System.out.println("Подзадача создана: " + id + " " + subtask.getName() + " в эпике №" + epicId);
         } else {
             System.out.println("Нельзя добавить задачу, задачи пересекаются по времени");
@@ -150,7 +145,7 @@ return Optional.of(getPrioritizedTasks().stream()
                 break;
             case TaskType.EPIC:
                 TaskProgress defaultStatus = TaskProgress.NEW;
-                epics.put(id, new Epic(id, name, description, type, defaultStatus, new HashMap<>(), startTime, minutesForDuration, endTime));
+                addEpic(id, new Epic(id, name, description, type, defaultStatus, new HashMap<>(), startTime, minutesForDuration, endTime));
 
                 break;
             case TaskType.SUBTASK:
@@ -261,17 +256,10 @@ return Optional.of(getPrioritizedTasks().stream()
                     break;
                 }
 
-                Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
 
-                current.put(id, new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration));
+                addSubtask(id, new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration));
                 System.out.println("Обновление подзадачи: " + id + " " + name + " в эпике: " + epicId);
 
-                addEpic(epicId, new Epic(epicId, epics.get(epicId).getName(),
-                        epics.get(epicId).getDescription(), epics.get(epicId).getType(),
-                        epics.get(epicId).getStatus(), current, epics.get(epicId).getStartTime().toString(),
-                        epics.get(epicId).getDuration(), epics.get(epicId).getEndTime().toString()));
-
-                updateEpicTaskStatus(epicId);
                 break;
             default:
                 System.out.println("Неправильный тип задачи");
