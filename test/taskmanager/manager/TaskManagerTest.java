@@ -31,10 +31,12 @@ protected abstract T createTaskManager();
         taskManager.createTask(TaskType.SUBTASK, "подзадача 1", "Выполнить работу", 1,
                 TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T02:00");
 
+
+
         taskManager.printAllTasks();
         taskManager.printEpicSubtasks(1);
 
-        assertNotNull(taskManager.getTask(0), "Такого объекта не существует");
+        assertTrue(taskManager.getTask(0).isPresent(), "Такого объекта не существует");
         assertNotNull(taskManager.getEpic(1), "Такого объекта не существует");
         assertNotNull(taskManager.getSubtask(2), "Такого объекта не существует");
 
@@ -43,17 +45,19 @@ protected abstract T createTaskManager();
         Task task1 = new Task(3, "Задача 2", "Выполнить работу", TaskType.TASK,
                 TaskProgress.NEW, "2005-12-15T00:00", 120);
 
-        assertEquals(task.getName(), taskManager.getTask(0).getName(), "Имена задач не совпадают");
-        assertEquals(task.getDescription(), taskManager.getTask(0).getDescription(), "Описания не совпадают");
+        assertEquals(task.getName(), taskManager.getTask(0).get().getName(), "Имена задач не совпадают");
+        assertEquals(task.getDescription(), taskManager.getTask(0).get().getDescription(), "Описания не совпадают");
 
         taskManager.createTask(task1.getType(), task1.getName(), task1.getDescription(), 0,
                 task1.getStatus(), task1.getStartTime().toString(), task1.getDuration(),
                 task1.getEndTime().toString());
 
-        assertEquals(task1.getType(), taskManager.getTask(3).getType(), "Типы не совпадают");
-        assertEquals(task1.getName(), taskManager.getTask(3).getName(), "Имена не совпадают");
-        assertEquals(task1.getDescription(), taskManager.getTask(3).getDescription(), "Описания не совпадают");
-        assertEquals(task1.getStatus(), taskManager.getTask(3).getStatus(), "Статусы не совпадают");
+        assertTrue(taskManager.getTask(3).isPresent(), "Такого объекта не существует");
+
+            assertEquals(task1.getType(), taskManager.getTask(3).get().getType(), "Типы не совпадают");
+        assertEquals(task1.getName(), taskManager.getTask(3).get().getName(), "Имена не совпадают");
+        assertEquals(task1.getDescription(), taskManager.getTask(3).get().getDescription(), "Описания не совпадают");
+        assertEquals(task1.getStatus(), taskManager.getTask(3).get().getStatus(), "Статусы не совпадают");
 
 
         HashMap<Integer, Subtask> subtasks = new HashMap<>();
@@ -178,7 +182,7 @@ protected abstract T createTaskManager();
 
         // Удаляем задачу
         taskManager.deleteTasksById(TaskType.TASK, 0);
-        assertNull(taskManager.getTask(0), "Задача не удалена");
+        assertFalse(taskManager.getTask(0).isPresent(), "Задача не удалена");
 
         // Удаляем подзадачу
         taskManager.deleteTasksById(TaskType.SUBTASK, 2);
@@ -201,9 +205,12 @@ protected abstract T createTaskManager();
         taskManager.createTask(TaskType.EPIC, "Эпик 1", "Описание", 0,
                 TaskProgress.NEW, "2005-12-13T00:00", 120, "2005-12-13T02:00");
 
-        taskManager.getTask(0);
+        assertTrue(taskManager.getTask(0).isPresent(), "Такого объекта не существует");
+
+
+        taskManager.getTask(0).get();
         taskManager.getEpic(1);
-        taskManager.getTask(0);
+        taskManager.getTask(0).get();
 
         List<Task> history = taskManager.getHistory();
         assertEquals(2, history.size(), "История должна содержать 2 уникальные задачи");
@@ -241,7 +248,7 @@ protected abstract T createTaskManager();
 
             taskManager.createTask(TaskType.TASK, "Задача 1", "Описание", 0,
                     TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
-            assertNotNull(taskManager.getTask(0), "Первая задача должна быть создана");
+        assertTrue(taskManager.getTask(0).isPresent(), "Такого объекта не существует");
 
             taskManager.createTask(TaskType.EPIC, "Эпик 1", "Описание", 0,
                     TaskProgress.NEW, "2005-12-13T00:00", 120, "2005-12-13T02:00");
@@ -258,25 +265,23 @@ protected abstract T createTaskManager();
 
             taskManager.createTask(TaskType.TASK, "Задача 2", "Описание", 0,
                     TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
-            assertNull(taskManager.getTask(3), "Полное пересечение, объект должен быть равен null");
+        assertFalse(taskManager.getTask(2).isPresent(), "Такого объекта не существует");
 
             taskManager.createTask(TaskType.TASK, "Задача 3", "Описание", 0,
                     TaskProgress.NEW, "2005-12-12T01:00", 60, "2005-12-12T02:00");
-            assertNull(taskManager.getTask(4), "Пересечение по началу, объект должен быть равен null");
-
+        assertFalse(taskManager.getTask(4).isPresent(), "Такого объекта не существует");
 
             taskManager.createTask(TaskType.TASK, "Задача 4", "Описание", 0,
                     TaskProgress.NEW, "2005-12-11T23:00", 120, "2005-12-12T01:00");
-            assertNull(taskManager.getTask(5), "Пересечение по концу, объект должен быть равен null");
-
+        assertFalse(taskManager.getTask(5).isPresent(), "Такого объекта не существует");
 
             taskManager.createTask(TaskType.TASK, "Задача 5", "Описание", 0,
                     TaskProgress.NEW, "2005-12-11T22:00", 60, "2005-12-11T23:00");
-            assertNotNull(taskManager.getTask(7), "Задача до существующей, не должна быть null");
+        assertTrue(taskManager.getTask(7).isPresent(), "Такого объекта не существует");
 
             taskManager.createTask(TaskType.TASK, "Задача 6", "Описание", 0,
                     TaskProgress.NEW, "2005-12-12T03:00", 60, "2005-12-12T04:00");
-            assertNotNull(taskManager.getTask(7), "Задача после существующей, не должна быть null");
+        assertTrue(taskManager.getTask(8).isPresent(), "Задача после существующей, не должна быть null");
 
             taskManager.createTask(TaskType.EPIC, "Эпик 2", "Описание", 0,
                     TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");

@@ -43,7 +43,7 @@ public interface TaskManager {
 
     boolean deleteAllTasks();
 
-    Task getTask(int id);
+    Optional<Task> getTask(int id);
 
     Subtask getSubtask(int id);
 

@@ -329,13 +329,13 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     @Override
-    public Task getTask(int id) {
+    public Optional<Task> getTask(int id) {
         if (!Validation.taskValidation(id, tasks)) {
-            return null;
+            return Optional.empty();
         }
 
         historyManager.addTask(tasks.get(id));
-        return tasks.get(id);
+        return Optional.of(tasks.get(id));
     }
 
     @Override
