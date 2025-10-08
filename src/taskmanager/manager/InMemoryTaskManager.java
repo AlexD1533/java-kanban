@@ -339,28 +339,28 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask getSubtask(int id) {
+    public Optional<Subtask> getSubtask(int id) {
 
         if (!Validation.subTaskValidation(id, epics)) {
-            return null;
+            return Optional.empty();
         }
         int epicId = getAllSubtasks(epics).get(id).getEpicId();
 
         if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
-            return null;
+            return Optional.empty();
         }
         historyManager.addTask(epics.get(epicId).getSubtasks().get(id));
-        return epics.get(epicId).getSubtasks().get(id);
+        return Optional.of(epics.get(epicId).getSubtasks().get(id));
     }
 
     @Override
-    public Epic getEpic(int id) {
+    public Optional<Epic> getEpic(int id) {
 
         if (!Validation.epicValidation(id, epics)) {
-            return null;
+            return Optional.empty();
         }
         historyManager.addTask(epics.get(id));
-        return epics.get(id);
+        return Optional.of(epics.get(id));
     }
 
 

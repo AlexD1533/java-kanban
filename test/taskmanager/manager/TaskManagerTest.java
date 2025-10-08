@@ -13,9 +13,10 @@ import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 abstract class TaskManagerTest<T extends TaskManager> {
-protected abstract T createTaskManager();
+    protected abstract T createTaskManager();
 
 
     @Test
@@ -32,13 +33,13 @@ protected abstract T createTaskManager();
                 TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T02:00");
 
 
-
         taskManager.printAllTasks();
         taskManager.printEpicSubtasks(1);
 
         assertTrue(taskManager.getTask(0).isPresent(), "Такого объекта не существует");
-        assertNotNull(taskManager.getEpic(1), "Такого объекта не существует");
-        assertNotNull(taskManager.getSubtask(2), "Такого объекта не существует");
+        assertTrue(taskManager.getEpic(1).isPresent(), "Такого объекта не существует");
+        assertTrue(taskManager.getSubtask(2).isPresent(), "Такого объекта не существует");
+
 
         Task task = new Task(0, "Задача 1", "Выполнить работу", TaskType.TASK,
                 TaskProgress.NEW, "2005-12-12T00:00", 120);
@@ -54,7 +55,7 @@ protected abstract T createTaskManager();
 
         assertTrue(taskManager.getTask(3).isPresent(), "Такого объекта не существует");
 
-            assertEquals(task1.getType(), taskManager.getTask(3).get().getType(), "Типы не совпадают");
+        assertEquals(task1.getType(), taskManager.getTask(3).get().getType(), "Типы не совпадают");
         assertEquals(task1.getName(), taskManager.getTask(3).get().getName(), "Имена не совпадают");
         assertEquals(task1.getDescription(), taskManager.getTask(3).get().getDescription(), "Описания не совпадают");
         assertEquals(task1.getStatus(), taskManager.getTask(3).get().getStatus(), "Статусы не совпадают");
@@ -70,16 +71,21 @@ protected abstract T createTaskManager();
         Epic epic1 = new Epic(4, "Эпик 2", "Выполнить работу", TaskType.EPIC,
                 TaskProgress.NEW, new HashMap<>(), "2005-12-16T00:00", 120, "2005-12-16T02:00");
 
-        assertEquals(epic.getName(), taskManager.getEpic(1).getName(), "Имена эпиков не совпадают");
+
+        assertTrue(taskManager.getEpic(1).isPresent(), "Такого объекта не существует");
+
+        assertEquals(epic.getName(), taskManager.getEpic(1).get().getName(), "Имена эпиков не совпадают");
 
         taskManager.createTask(epic1.getType(), epic1.getName(), epic1.getDescription(), 0,
                 epic1.getStatus(), epic1.getStartTime().toString(), epic1.getDuration(),
                 epic1.getEndTime().toString());
 
-        assertEquals(epic1.getType(), taskManager.getEpic(4).getType(), "Типы эпиков не совпадают");
-        assertEquals(epic1.getName(), taskManager.getEpic(4).getName(), "Имена эпиков не совпадают");
-        assertEquals(epic1.getDescription(), taskManager.getEpic(4).getDescription(), "Описания эпиков не совпадают");
-        assertEquals(epic1.getStatus(), taskManager.getEpic(4).getStatus(), "Статусы эпиков не совпадают");
+        assertTrue(taskManager.getEpic(4).isPresent(), "Такого объекта не существует");
+
+        assertEquals(epic1.getType(), taskManager.getEpic(4).get().getType(), "Типы эпиков не совпадают");
+        assertEquals(epic1.getName(), taskManager.getEpic(4).get().getName(), "Имена эпиков не совпадают");
+        assertEquals(epic1.getDescription(), taskManager.getEpic(4).get().getDescription(), "Описания эпиков не совпадают");
+        assertEquals(epic1.getStatus(), taskManager.getEpic(4).get().getStatus(), "Статусы эпиков не совпадают");
 
         // Subtask с временными параметрами
         Subtask subtask = new Subtask(2, "подзадача 1", "Выполнить работу",
@@ -87,18 +93,22 @@ protected abstract T createTaskManager();
         Subtask subtask1 = new Subtask(5, "Подзадача 2", "Выполнить работу",
                 TaskType.SUBTASK, 1, TaskProgress.NEW, "2005-12-17T00:00", 120);
 
-        assertEquals(subtask.getName(), taskManager.getSubtask(2).getName(), "Имена подзадач не совпадают");
-        assertEquals(subtask.getEpicId(), taskManager.getSubtask(2).getEpicId(), "EpicId не совпадают");
+        assertTrue(taskManager.getSubtask(2).isPresent(), "Такого объекта не существует");
+
+        assertEquals(subtask.getName(), taskManager.getSubtask(2).get().getName(), "Имена подзадач не совпадают");
+        assertEquals(subtask.getEpicId(), taskManager.getSubtask(2).get().getEpicId(), "EpicId не совпадают");
 
         taskManager.createTask(subtask1.getType(), subtask1.getName(), subtask1.getDescription(),
                 subtask1.getEpicId(), subtask1.getStatus(), subtask1.getStartTime().toString(),
                 subtask1.getDuration(), subtask1.getEndTime().toString());
 
-        assertEquals(subtask1.getType(), taskManager.getSubtask(5).getType(), "Типы подзадач не совпадают");
-        assertEquals(subtask1.getName(), taskManager.getSubtask(5).getName(), "Имена подзадач не совпадают");
-        assertEquals(subtask1.getDescription(), taskManager.getSubtask(5).getDescription(), "Описания подзадач не совпадают");
-        assertEquals(subtask1.getStatus(), taskManager.getSubtask(5).getStatus(), "Статусы подзадач не совпадают");
-        assertEquals(subtask1.getEpicId(), taskManager.getSubtask(5).getEpicId(), "EpicId подзадач не совпадают");
+        assertTrue(taskManager.getSubtask(5).isPresent(), "Такого объекта не существует");
+
+        assertEquals(subtask1.getType(), taskManager.getSubtask(5).get().getType(), "Типы подзадач не совпадают");
+        assertEquals(subtask1.getName(), taskManager.getSubtask(5).get().getName(), "Имена подзадач не совпадают");
+        assertEquals(subtask1.getDescription(), taskManager.getSubtask(5).get().getDescription(), "Описания подзадач не совпадают");
+        assertEquals(subtask1.getStatus(), taskManager.getSubtask(5).get().getStatus(), "Статусы подзадач не совпадают");
+        assertEquals(subtask1.getEpicId(), taskManager.getSubtask(5).get().getEpicId(), "EpicId подзадач не совпадают");
 
         assertTrue(taskManager.deleteAllTasks());
         taskManager.printAllTasks();
@@ -125,26 +135,30 @@ protected abstract T createTaskManager();
                 TaskProgress.NEW, 1, "2005-12-14T00:00", 120, "2005-12-14T02:00");
         taskManager.updateTask(TaskType.SUBTASK, 3, "Подзадача hello", "Выполнить работу",
                 TaskProgress.NEW, 1, "2005-12-15T00:00", 120, "2005-12-15T02:00");
-        assertEquals(TaskProgress.NEW, taskManager.getEpic(1).getStatus(), "Статусы не совпадают");
+
+        assertTrue(taskManager.getEpic(1).isPresent(), "Такого объекта не существует");
+
+        assertEquals(TaskProgress.NEW, taskManager.getEpic(1).get().getStatus(), "Статусы не совпадают");
 
 
         taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача hello", "Выполнить работу",
                 TaskProgress.IN_PROGRESS, 1, "2005-12-14T00:00", 120, "2005-12-14T02:00");
         taskManager.updateTask(TaskType.SUBTASK, 3, "Подзадача hello", "Выполнить работу",
                 TaskProgress.IN_PROGRESS, 1, "2005-12-15T00:00", 120, "2005-12-15T02:00");
-        assertEquals(TaskProgress.IN_PROGRESS, taskManager.getEpic(1).getStatus(), "Статусы не совпадают");
+        assertEquals(TaskProgress.IN_PROGRESS, taskManager.getEpic(1).get().getStatus(), "Статусы не совпадают");
 
         taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача hello", "Выполнить работу",
                 TaskProgress.DONE, 1, "2005-12-14T00:00", 120, "2005-12-14T02:00");
         taskManager.updateTask(TaskType.SUBTASK, 3, "Подзадача hello", "Выполнить работу",
                 TaskProgress.DONE, 1, "2005-12-15T00:00", 120, "2005-12-15T02:00");
-        assertEquals(TaskProgress.DONE, taskManager.getEpic(1).getStatus(), "Статусы не совпадают");
+        assertEquals(TaskProgress.DONE, taskManager.getEpic(1).get().getStatus(), "Статусы не совпадают");
 
         taskManager.updateTask(TaskType.SUBTASK, 2, "Подзадача hello", "Выполнить работу",
                 TaskProgress.NEW, 1, "2005-12-14T00:00", 120, "2005-12-14T02:00");
         taskManager.updateTask(TaskType.SUBTASK, 3, "Подзадача hello", "Выполнить работу",
                 TaskProgress.DONE, 1, "2005-12-15T00:00", 120, "2005-12-15T02:00");
-        assertEquals(TaskProgress.IN_PROGRESS, taskManager.getEpic(1).getStatus(), "Статусы не совпадают");
+
+        assertEquals(TaskProgress.IN_PROGRESS, taskManager.getEpic(1).get().getStatus(), "Статусы не совпадают");
     }
 
     @Test
@@ -186,11 +200,11 @@ protected abstract T createTaskManager();
 
         // Удаляем подзадачу
         taskManager.deleteTasksById(TaskType.SUBTASK, 2);
-        assertNull(taskManager.getSubtask(2), "Подзадача не удалена");
+        assertFalse(taskManager.getSubtask(2).isPresent(), "Подзадача не удалена");
 
         // Удаляем эпик (должны удалиться и его подзадачи)
         taskManager.deleteTasksById(TaskType.EPIC, 1);
-        assertNull(taskManager.getEpic(1), "Эпик не удален");
+        assertFalse(taskManager.getEpic(1).isPresent(), "Эпик не удален");
     }
 
 
@@ -206,10 +220,11 @@ protected abstract T createTaskManager();
                 TaskProgress.NEW, "2005-12-13T00:00", 120, "2005-12-13T02:00");
 
         assertTrue(taskManager.getTask(0).isPresent(), "Такого объекта не существует");
+        assertTrue(taskManager.getEpic(1).isPresent(), "Такого объекта не существует");
 
 
         taskManager.getTask(0).get();
-        taskManager.getEpic(1);
+        taskManager.getEpic(1).get();
         taskManager.getTask(0).get();
 
         List<Task> history = taskManager.getHistory();
@@ -242,54 +257,54 @@ protected abstract T createTaskManager();
     @Order(7)
     public void testIntersections() {
 
-            System.out.println("пересечения");
-            TaskManager taskManager = createTaskManager();
-            taskManager.deleteAllTasks();
+        System.out.println("пересечения");
+        TaskManager taskManager = createTaskManager();
+        taskManager.deleteAllTasks();
 
-            taskManager.createTask(TaskType.TASK, "Задача 1", "Описание", 0,
-                    TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
+        taskManager.createTask(TaskType.TASK, "Задача 1", "Описание", 0,
+                TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
         assertTrue(taskManager.getTask(0).isPresent(), "Такого объекта не существует");
 
-            taskManager.createTask(TaskType.EPIC, "Эпик 1", "Описание", 0,
-                    TaskProgress.NEW, "2005-12-13T00:00", 120, "2005-12-13T02:00");
-            assertNotNull(taskManager.getEpic(1), "Эпик должен быть создан");
+        taskManager.createTask(TaskType.EPIC, "Эпик 1", "Описание", 0,
+                TaskProgress.NEW, "2005-12-13T00:00", 120, "2005-12-13T02:00");
+        assertTrue(taskManager.getEpic(1).isPresent(), "Эпик должен быть создан");
 
-            taskManager.createTask(TaskType.SUBTASK, "Подзадача 1", "Описание", 1,
-                    TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-14T02:00");
-            assertNull(taskManager.getSubtask(2), "Пересечение с существующей задачей, объект должен быть равен null");
+        taskManager.createTask(TaskType.SUBTASK, "Подзадача 1", "Описание", 1,
+                TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-14T02:00");
+        assertFalse(taskManager.getSubtask(2).isPresent(), "Пересечение с существующей задачей, объект должен быть равен null");
 
 
-            taskManager.createTask(TaskType.SUBTASK, "Подзадача 2", "Описание", 1,
-                    TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T02:00");
-            assertNotNull(taskManager.getSubtask(3), "Объекты не пересекаются, не должен быть равен null");
+        taskManager.createTask(TaskType.SUBTASK, "Подзадача 2", "Описание", 1,
+                TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T02:00");
+        assertTrue(taskManager.getSubtask(3).isPresent(), "Объекты не пересекаются, не должен быть равен null");
 
-            taskManager.createTask(TaskType.TASK, "Задача 2", "Описание", 0,
-                    TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
+        taskManager.createTask(TaskType.TASK, "Задача 2", "Описание", 0,
+                TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
         assertFalse(taskManager.getTask(2).isPresent(), "Такого объекта не существует");
 
-            taskManager.createTask(TaskType.TASK, "Задача 3", "Описание", 0,
-                    TaskProgress.NEW, "2005-12-12T01:00", 60, "2005-12-12T02:00");
+        taskManager.createTask(TaskType.TASK, "Задача 3", "Описание", 0,
+                TaskProgress.NEW, "2005-12-12T01:00", 60, "2005-12-12T02:00");
         assertFalse(taskManager.getTask(4).isPresent(), "Такого объекта не существует");
 
-            taskManager.createTask(TaskType.TASK, "Задача 4", "Описание", 0,
-                    TaskProgress.NEW, "2005-12-11T23:00", 120, "2005-12-12T01:00");
+        taskManager.createTask(TaskType.TASK, "Задача 4", "Описание", 0,
+                TaskProgress.NEW, "2005-12-11T23:00", 120, "2005-12-12T01:00");
         assertFalse(taskManager.getTask(5).isPresent(), "Такого объекта не существует");
 
-            taskManager.createTask(TaskType.TASK, "Задача 5", "Описание", 0,
-                    TaskProgress.NEW, "2005-12-11T22:00", 60, "2005-12-11T23:00");
+        taskManager.createTask(TaskType.TASK, "Задача 5", "Описание", 0,
+                TaskProgress.NEW, "2005-12-11T22:00", 60, "2005-12-11T23:00");
         assertTrue(taskManager.getTask(7).isPresent(), "Такого объекта не существует");
 
-            taskManager.createTask(TaskType.TASK, "Задача 6", "Описание", 0,
-                    TaskProgress.NEW, "2005-12-12T03:00", 60, "2005-12-12T04:00");
+        taskManager.createTask(TaskType.TASK, "Задача 6", "Описание", 0,
+                TaskProgress.NEW, "2005-12-12T03:00", 60, "2005-12-12T04:00");
         assertTrue(taskManager.getTask(8).isPresent(), "Задача после существующей, не должна быть null");
 
-            taskManager.createTask(TaskType.EPIC, "Эпик 2", "Описание", 0,
-                    TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
-            assertNotNull(taskManager.getEpic(9), "Эпик может быть создан в любое время, не должен быть null");
+        taskManager.createTask(TaskType.EPIC, "Эпик 2", "Описание", 0,
+                TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
+        assertTrue(taskManager.getEpic(9).isPresent(), "Эпик может быть создан в любое время, не должен быть null");
 
-            System.out.println("Тест пересечений завершен");
-        }
-
+        System.out.println("Тест пересечений завершен");
     }
+
+}
 
 

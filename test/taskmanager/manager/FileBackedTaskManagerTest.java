@@ -20,14 +20,15 @@ class FileBackedTaskManagerTest {
     @Test
     @Order(1)
     public void saveAndLoadNonExistentDir() {
-File nonExistenFile = new File("asd/asd/asd/asd.scv");
+        File nonExistenFile = new File("asd/asd/asd/asd.scv");
         FileBackedTaskManager taskManager = new FileBackedTaskManager(nonExistenFile);
 
         assertThrows(ManagerSaveException.class, () ->
                 taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0,
-                TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00"), "Должно быть выброшено исключение");
+                        TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00"), "Должно быть выброшено исключение");
 
     }
+
     @Test
     @Order(2)
     public void saveAndLoadEmptyFile() {
