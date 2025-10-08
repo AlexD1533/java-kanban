@@ -2,8 +2,6 @@ package taskmanager.model;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Formatter;
 import java.util.Objects;
 
 public class Task {
@@ -20,7 +18,6 @@ public class Task {
         return duration.toMinutes();
     }
 
-  //  private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
     @Override
     public String toString() {
         return type + "{" +
