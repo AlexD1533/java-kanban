@@ -32,7 +32,7 @@ protected abstract T createTaskManager();
                 TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T02:00");
 
         taskManager.printAllTasks();
-        taskManager.getEpicTasks(1);
+        taskManager.printEpicSubtasks(1);
 
         assertNotNull(taskManager.getTask(0), "Такого объекта не существует");
         assertNotNull(taskManager.getEpic(1), "Такого объекта не существует");

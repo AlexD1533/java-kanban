@@ -256,7 +256,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void getEpicTasks(int id) {
+    public void printEpicSubtasks(int id) {
 
         if (!Validation.epicValidation(id, epics)) {
             return;
@@ -272,6 +272,10 @@ public class InMemoryTaskManager implements TaskManager {
         epics.get(id).getSubtasks().values().forEach(System.out::println);
     }
 
+    @Override
+    public Stream<Subtask> getEpicSubtasks(int epicId) {
+        return epics.get(epicId).getSubtasks().values().stream();
+    }
 
     @Override
     public Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics) {

@@ -58,7 +58,6 @@ File nonExistenFile = new File("asd/asd/asd/asd.scv");
         System.out.println("Удаляем все задачи");
         taskManager.deleteAllTasks();
 
-        // Создаем задачи с временными параметрами
         taskManager.createTask(TaskType.TASK, "Задача 1", "Выполнить работу", 0,
                 TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
         taskManager.createTask(TaskType.EPIC, "Эпик 1", "Выполнить работу", 0,

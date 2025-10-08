@@ -60,7 +60,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         taskManager.printAllTasks();
         System.out.println();
 
-        taskManager.getEpicTasks(2);
+        taskManager.printEpicSubtasks(2);
 
         System.out.println();
         for(Task task : taskManager.getPrioritizedTasks()) {

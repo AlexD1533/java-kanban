@@ -24,7 +24,7 @@ public interface TaskManager {
  Optional<LocalDateTime> updateEpicEndTime(Map<Integer, Subtask> map);
 
 
-
+    Stream<Subtask> getEpicSubtasks(int epicId);
 
     Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics);
 
@@ -53,7 +53,7 @@ public interface TaskManager {
 
     void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId, String startTime, long minutesForDuration, String endTime);
 
-    void getEpicTasks(int id);
+    void printEpicSubtasks(int id);
 
     void updateEpicTaskStatus(int epicId);
 
