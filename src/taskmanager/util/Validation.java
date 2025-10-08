@@ -5,7 +5,6 @@ import taskmanager.model.Task;
 import taskmanager.model.Subtask;
 
 import java.time.DateTimeException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -30,7 +29,6 @@ public final class Validation {
             System.out.println("Неправильный формат ввода даты");
             return false;
         }
-
 
 
         return true;
