@@ -40,6 +40,7 @@ public class Task {
         this.startTime = LocalDateTime.parse(startTime);
 this.duration = Duration.ofMinutes(minutesForDuration);
     }
+
     public LocalDateTime getStartTime() {
         return startTime;
     }
