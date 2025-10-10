@@ -246,11 +246,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createTask(TaskType.TASK, "Задача 3", "Описание", 0,
                 TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T02:00");
 
-        TreeSet<Task> prioritized = taskManager.getPrioritizedTasks();
+        List<Task> prioritized = taskManager.getPrioritizedTasks();
         assertEquals(3, prioritized.size(), "Неверное количество приоритетных задач");
 
-        assertEquals("Задача 1", prioritized.getFirst().getName(), "Первая задача должна быть Задача 1");
-        assertEquals("Задача 3", prioritized.getLast().getName(), "Третья задача должна быть Задача 3");
+        assertEquals("Задача 1", prioritized.get(0).getName(), "Первая задача должна быть Задача 1");
+        assertEquals("Задача 3", prioritized.get(prioritized.size()-1).getName(), "Третья задача должна быть Задача 3");
     }
 
     @Test
