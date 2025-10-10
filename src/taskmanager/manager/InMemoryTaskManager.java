@@ -27,21 +27,30 @@ public class InMemoryTaskManager implements TaskManager {
         return Map.copyOf(epics);
     }
 
-    private static final TreeSet<Task> priorityTasks = new TreeSet<>(
-            Comparator.comparing(Task::getStartTime)
-            .thenComparing(Task::getId));
-
 
     @Override
-    public Optional<Boolean> checkIntersections(Task t1) {
+    public boolean checkIntersections(Task t1, Task t2) {
+        if (t1 == null || t2 == null) return false;
+        if (t1.getStartTime().isBefore(t2.getEndTime()) && t1.getEndTime().isAfter(t2.getStartTime())) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Optional<Boolean> checkIntersectionsByList(Task t1) {
         return Optional.of(getPrioritizedTasks().stream()
                 .filter(task -> task.getId() != t1.getId())
                 .filter(task -> !(task instanceof Epic))
-                .anyMatch(task -> t1.getStartTime().isBefore(task.getEndTime()) && t1.getEndTime().isAfter(task.getStartTime())));
+                .anyMatch(task -> checkIntersections(t1, task)));
     }
 
     @Override
     public List<Task> getPrioritizedTasks() {
+        TreeSet<Task> priorityTasks = new TreeSet<>(
+                Comparator.comparing(Task::getStartTime)
+                        .thenComparing(Task::getId));
+
         priorityTasks.addAll(getAllTasks().values());
         return List.copyOf(priorityTasks);
     }
@@ -84,7 +93,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addTask(int id, Task task) {
-        boolean isIntersection = checkIntersections(task).orElseThrow(() ->
+        boolean isIntersection = checkIntersectionsByList(task).orElseThrow(() ->
                 new RuntimeException("Ошибка сравнения пересечений"));
         if (!isIntersection) {
             tasks.put(id, task);
@@ -102,7 +111,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addSubtask(int id, Subtask subtask) {
-        boolean isIntersection = checkIntersections(subtask).orElseThrow(() ->
+        boolean isIntersection = checkIntersectionsByList(subtask).orElseThrow(() ->
                 new RuntimeException("Ошибка сравнения пересечений"));
         if (!isIntersection) {
 
