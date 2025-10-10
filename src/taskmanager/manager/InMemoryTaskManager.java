@@ -27,6 +27,10 @@ public class InMemoryTaskManager implements TaskManager {
         return Map.copyOf(epics);
     }
 
+    private static final TreeSet<Task> priorityTasks = new TreeSet<>(
+            Comparator.comparing(Task::getStartTime)
+            .thenComparing(Task::getId));
+
 
     @Override
     public Optional<Boolean> checkIntersections(Task t1) {
@@ -37,12 +41,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public TreeSet<Task> getPrioritizedTasks() {
-        TreeSet<Task> result = new TreeSet<>(
-                Comparator.comparing(Task::getStartTime)
-                        .thenComparing(Task::getId));
-        result.addAll(getAllTasks().values());
-        return result;
+    public List<Task> getPrioritizedTasks() {
+        priorityTasks.addAll(getAllTasks().values());
+        return List.copyOf(priorityTasks);
     }
 
     @Override

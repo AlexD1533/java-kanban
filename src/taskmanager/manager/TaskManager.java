@@ -12,16 +12,16 @@ public interface TaskManager {
 
     Optional<Boolean> checkIntersections(Task t1);
 
-    TreeSet<Task> getPrioritizedTasks();
+    List<Task> getPrioritizedTasks();
 
- TreeMap<Integer, Task> getAllTasks();
+    TreeMap<Integer, Task> getAllTasks();
 
 
- Stream<Task> allTasksStream();
+    Stream<Task> allTasksStream();
 
- Optional<LocalDateTime> updateEpicStartTime(Map<Integer, Subtask> map);
+    Optional<LocalDateTime> updateEpicStartTime(Map<Integer, Subtask> map);
 
- Optional<LocalDateTime> updateEpicEndTime(Map<Integer, Subtask> map);
+    Optional<LocalDateTime> updateEpicEndTime(Map<Integer, Subtask> map);
 
 
     Stream<Subtask> getEpicSubtasks(int epicId);
@@ -48,7 +48,6 @@ public interface TaskManager {
     Optional<Subtask> getSubtask(int id);
 
     Optional<Epic> getEpic(int id);
-
 
 
     void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId, String startTime, long minutesForDuration, String endTime);
