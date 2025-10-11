@@ -73,7 +73,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         return switch (type) {
             case EPIC -> new Epic(id, res[2], res[4], type,
-                    progress, new HashMap<>(), res[6], durationMinutes, endTime);
+                    progress, new HashMap<>());
             case TASK -> new Task(id, res[2], res[4], type,
                     progress, res[6], durationMinutes);
             case SUBTASK -> {
