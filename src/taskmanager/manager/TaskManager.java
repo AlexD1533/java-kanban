@@ -21,10 +21,6 @@ public interface TaskManager {
 
     Stream<Task> allTasksStream();
 
-    Optional<LocalDateTime> updateEpicStartTime(Map<Integer, Subtask> map);
-
-    Optional<LocalDateTime> updateEpicEndTime(Map<Integer, Subtask> map);
-
 
     Stream<Subtask> getEpicSubtasks(int epicId);
 

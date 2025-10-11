@@ -19,9 +19,9 @@ class TaskTest {
 
         // Тестируем эпики с временными параметрами
         Task task3 = new Epic(1, "Эпик 1", "Выполнить работу", TaskType.EPIC,
-                TaskProgress.NEW, new HashMap<>(), "2005-12-13T00:00", 120, "2005-12-13T02:00");
+                TaskProgress.NEW, new HashMap<>());
         Task task4 = new Epic(1, "Эпик 1", "Выполнить работу", TaskType.EPIC,
-                TaskProgress.NEW, new HashMap<>(), "2005-12-13T00:00", 120, "2005-12-13T02:00");
+                TaskProgress.NEW, new HashMap<>());
         assertEquals(task3, task4, "Эпики не совпадают");
 
         // Тестируем подзадачи с временными параметрами
@@ -35,7 +35,7 @@ class TaskTest {
     @Test
     public void shouldNotCastEpicToSubtask() {
         Epic epic1 = new Epic(1, "Эпик 1", "Выполнить работу", TaskType.EPIC,
-                TaskProgress.NEW, new HashMap<>(), "2005-12-13T00:00", 120, "2005-12-13T02:00");
+                TaskProgress.NEW, new HashMap<>());
         assertThrows(ClassCastException.class, () -> {
             Subtask currentSubtask = (Subtask) (Task) epic1;
             epic1.getSubtasks().put(currentSubtask.getId(), currentSubtask);
@@ -75,7 +75,7 @@ class TaskTest {
         subtasks.put(2, subtask);
 
         Epic epic = new Epic(1, "Эпик", "Описание эпика", TaskType.EPIC,
-                TaskProgress.NEW, subtasks, "2005-12-12T00:00", 180, "2005-12-12T03:00");
+                TaskProgress.NEW, subtasks);
 
         assertEquals(1, epic.getId(), "ID не совпадает");
         assertEquals("Эпик", epic.getName(), "Имя не совпадает");
@@ -84,8 +84,9 @@ class TaskTest {
         assertEquals(TaskProgress.NEW, epic.getStatus(), "Статус не совпадает");
         assertEquals(subtasks, epic.getSubtasks(), "Подзадачи не совпадают");
         assertEquals(1, epic.getSubtasks().size(), "Количество подзадач не совпадает");
-        assertEquals(LocalDateTime.parse("2005-12-12T00:00"), epic.getStartTime(), "Время начала не совпадает");
-        assertEquals(180, epic.getDuration(), "Продолжительность не совпадает");
+        assertEquals(LocalDateTime.parse("2005-12-13T00:00"), epic.getStartTime(), "Время начала не совпадает");
+        assertEquals(60, epic.getDuration(), "Продолжительность не совпадает");
+
     }
 
     @Test

@@ -11,11 +11,30 @@ public class Task {
     private final String description;
     private TaskProgress status;
     private final TaskType type;
-    private final LocalDateTime startTime;
+    protected LocalDateTime startTime;
     private final Duration duration;
+    private final String defaultTime = "2005-12-12T02:00";
+    private final long defaultDuration = 0;
 
-    public long getDuration() {
-        return duration.toMinutes();
+
+    public Task(int id, String name, String description, TaskType type, TaskProgress status, String startTime, long minutesForDuration) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.type = type;
+        this.startTime = LocalDateTime.parse(startTime);
+        this.duration = Duration.ofMinutes(minutesForDuration);
+    }
+
+    public Task(int id, String name, String description, TaskType type, TaskProgress status) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.type = type;
+        this.startTime = LocalDateTime.parse(defaultTime);
+        this.duration = Duration.ofMinutes(defaultDuration);
     }
 
     @Override
@@ -31,24 +50,6 @@ public class Task {
                 '}';
     }
 
-    public Task(int id, String name, String description, TaskType type, TaskProgress status, String startTime, long minutesForDuration) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.status = status;
-        this.type = type;
-        this.startTime = LocalDateTime.parse(startTime);
-this.duration = Duration.ofMinutes(minutesForDuration);
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return startTime.plus(duration);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -61,6 +62,19 @@ this.duration = Duration.ofMinutes(minutesForDuration);
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    public long getDuration() {
+        return duration.toMinutes();
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
+    }
+
 
     public TaskProgress getStatus() {
         return status;

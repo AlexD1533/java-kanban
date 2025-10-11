@@ -67,9 +67,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
         subtasks.put(2, existingSubtask);
 
         Epic epic = new Epic(1, "Эпик 1", "Выполнить работу", TaskType.EPIC,
-                TaskProgress.NEW, subtasks, "2005-12-13T00:00", 120, "2005-12-13T02:00");
+                TaskProgress.NEW, subtasks);
         Epic epic1 = new Epic(4, "Эпик 2", "Выполнить работу", TaskType.EPIC,
-                TaskProgress.NEW, new HashMap<>(), "2005-12-16T00:00", 120, "2005-12-16T02:00");
+                TaskProgress.NEW, new HashMap<>());
 
 
         assertTrue(taskManager.getEpic(1).isPresent(), "Такого объекта не существует");
