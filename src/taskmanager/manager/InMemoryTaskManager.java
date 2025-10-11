@@ -6,9 +6,6 @@ import taskmanager.model.Subtask;
 import taskmanager.model.TaskProgress;
 import taskmanager.model.TaskType;
 import taskmanager.util.Validation;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
