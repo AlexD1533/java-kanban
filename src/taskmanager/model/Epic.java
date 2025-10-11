@@ -22,6 +22,7 @@ public class Epic extends Task {
     public long getDuration() {
         return Duration.between(startTime, endTime).toMinutes();
     }
+
     @Override
     public LocalDateTime getStartTime() {
         return updateEpicStartTime(getSubtasks()).orElse(LocalDateTime.parse(defaultTime));
@@ -32,23 +33,10 @@ public class Epic extends Task {
         return updateEpicEndTime(getSubtasks()).orElse(LocalDateTime.parse(defaultTime));
     }
 
-    @Override
-    public String toString() {
-        return this.getType() + "{" +
-                "id=" + this.getId() +
-                ", name='" + this.getName() + '\'' +
-                ", description='" + this.getDescription() + '\'' +
-                ", status=" + this.getStatus() +
-                ", startTime=" + this.getStartTime() +
-                ", duration=" + this.getDuration() + " minutes" +
-                ", endTime=" + this.endTime +
-                '}';
-    }
 
     public Map<Integer, Subtask> getSubtasks() {
         return Map.copyOf(subtasks);
     }
-
 
 
     public Optional<LocalDateTime> updateEpicStartTime(Map<Integer, Subtask> map) {
@@ -64,5 +52,17 @@ public class Epic extends Task {
                 .max(LocalDateTime::compareTo);
     }
 
+    @Override
+    public String toString() {
+        return this.getType() + "{" +
+                "id=" + this.getId() +
+                ", name='" + this.getName() + '\'' +
+                ", description='" + this.getDescription() + '\'' +
+                ", status=" + this.getStatus() +
+                ", startTime=" + this.getStartTime() +
+                ", duration=" + this.getDuration() + " minutes" +
+                ", endTime=" + this.endTime +
+                '}';
+    }
 
 }

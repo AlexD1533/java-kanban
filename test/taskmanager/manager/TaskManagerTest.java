@@ -250,7 +250,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(3, prioritized.size(), "Неверное количество приоритетных задач");
 
         assertEquals("Задача 1", prioritized.get(0).getName(), "Первая задача должна быть Задача 1");
-        assertEquals("Задача 3", prioritized.get(prioritized.size()-1).getName(), "Третья задача должна быть Задача 3");
+        assertEquals("Задача 3", prioritized.get(prioritized.size() - 1).getName(), "Третья задача должна быть Задача 3");
     }
 
     @Test
