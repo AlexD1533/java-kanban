@@ -4,15 +4,32 @@ import taskmanager.model.Epic;
 import taskmanager.model.Task;
 import taskmanager.model.Subtask;
 
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
 public final class Validation {
-    public static boolean inputValidation(String name) {
+    public static boolean inputValidation(String name, String startTime, String endTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
         if (name == null || name.isBlank()) {
             System.out.println("Имя не должно быть пустым");
             return false;
         }
+        if (startTime == null || startTime.isBlank()) {
+            System.out.println("Поле startTime не должно быть пустым");
+            return false;
+        }
+        try {
+            LocalDateTime.parse(startTime, formatter);
+            LocalDateTime.parse(endTime, formatter);
+
+        } catch (DateTimeException e) {
+            System.out.println("Неправильный формат ввода даты");
+            return false;
+        }
+
 
         return true;
     }
