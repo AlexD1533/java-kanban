@@ -1,10 +1,5 @@
 package taskmanager.http.handlers;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import taskmanager.http.Endpoint;
@@ -12,11 +7,10 @@ import taskmanager.manager.TaskManager;
 import taskmanager.model.Task;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
@@ -49,59 +43,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
-
-    private static class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-
-        @Override
-        public void write(JsonWriter jsonWriter, LocalDateTime localDateTime) throws IOException {
-            if (localDateTime == null) {
-                jsonWriter.nullValue();
-            } else {
-                jsonWriter.value(localDateTime.format(formatter));
-            }
-
-        }
-
-        @Override
-        public LocalDateTime read(JsonReader jsonReader) throws IOException {
-            String value = jsonReader.nextString();
-
-            return value != null ? LocalDateTime.parse(value, formatter) : null;
-        }
-    }
-
-
-    private static class DurationAdapter extends TypeAdapter<Duration> {
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-
-        @Override
-        public void write(JsonWriter jsonWriter, Duration duration) throws IOException {
-            if (duration == null) {
-                jsonWriter.nullValue();
-            } else {
-                jsonWriter.value(duration.toMinutes());
-            }
-
-        }
-
-        @Override
-        public Duration read(JsonReader jsonReader) throws IOException {
-            long minutes = jsonReader.nextLong();
-
-            return Duration.ofMinutes(minutes);
-        }
-    }
-
-
     private void handleGetAll(HttpExchange exchange) throws IOException {
-
-      //  GsonBuilder gsonBuilder = new GsonBuilder();
-
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .setPrettyPrinting().create();
 
         List<Task> allTask = new ArrayList<>(manager.getTasks().values());
         System.out.println("handleGet: " + allTask);
@@ -111,19 +53,54 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             System.out.println("list is empty");
             return;
         }
-
-      String response = gson.toJson(allTask);
+        String response = gson.toJson(allTask);
         sendText(exchange, response);
 
     }
 
-    private void handleGetId(HttpExchange exchange) {
+    private void handleGetId(HttpExchange exchange) throws IOException {
+
+        Optional<Integer> taskId = getTaskId(exchange);
+        if (taskId.isPresent()) {
+            int id = taskId.get();
+            if (manager.getTask(id).isPresent()) {
+                Task task = manager.getTask(id).get();
+                String response = gson.toJson(task);
+                sendText(exchange, response);
+            } else {
+                sendNotFound(exchange);
+            }
+        } else {
+            sendNotFound(exchange);
+        }
     }
 
     private void handleCreate(HttpExchange exchange) {
+
+
+
+
+
+
     }
 
-    private void handleUpdate(HttpExchange exchange) {
+    private void handleUpdate(HttpExchange exchange) throws IOException {
+        Optional<Integer> taskId = getTaskId(exchange);
+        if (taskId.isPresent()) {
+            int id = taskId.get();
+String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            Task task = gson.fromJson(body, Task.class);
+
+            System.out.println("TASK " + task);
+
+            manager.updateTask(task.getType(), id, task.getName(), task.getDescription(), task.getStatus(),
+                    0, task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
+            sendText(exchange, task.toString());
+
+
+        } else {
+            sendNotFound(exchange);
+        }
     }
 
     private void handleDeleteById(HttpExchange exchange) {
