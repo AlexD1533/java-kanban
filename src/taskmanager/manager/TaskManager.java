@@ -7,6 +7,8 @@ import java.util.stream.Stream;
 public interface TaskManager {
 
 
+    Map<Integer, Task> getTasks();
+
     boolean checkIntersections(Task t1, Task t2);
 
     Optional<Boolean> checkIntersectionsByList(Task t1);
