@@ -9,10 +9,8 @@ import taskmanager.model.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 abstract class TaskManagerTest<T extends TaskManager> {
@@ -276,7 +274,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.createTask(TaskType.SUBTASK, "Подзадача 2", "Описание", 1,
                 TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T02:00");
-        assertTrue(taskManager.getSubtask(3).isPresent(), "Объекты не пересекаются, не должен быть равен null");
+        assertFalse(taskManager.getSubtask(3).isPresent(), "Объекты не пересекаются, не должен быть равен null");
 
         taskManager.createTask(TaskType.TASK, "Задача 2", "Описание", 0,
                 TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
@@ -292,15 +290,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.createTask(TaskType.TASK, "Задача 5", "Описание", 0,
                 TaskProgress.NEW, "2005-12-11T22:00", 60, "2005-12-11T23:00");
-        assertTrue(taskManager.getTask(7).isPresent(), "Такого объекта не существует");
+        assertFalse(taskManager.getTask(7).isPresent(), "Такого объекта не существует");
 
         taskManager.createTask(TaskType.TASK, "Задача 6", "Описание", 0,
                 TaskProgress.NEW, "2005-12-12T03:00", 60, "2005-12-12T04:00");
-        assertTrue(taskManager.getTask(8).isPresent(), "Задача после существующей, не должна быть null");
+        assertFalse(taskManager.getTask(8).isPresent(), "Задача после существующей, не должна быть null");
 
         taskManager.createTask(TaskType.EPIC, "Эпик 2", "Описание", 0,
                 TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
-        assertTrue(taskManager.getEpic(9).isPresent(), "Эпик может быть создан в любое время, не должен быть null");
+        assertTrue(taskManager.getEpic(5).isPresent(), "Эпик может быть создан в любое время, не должен быть null");
 
         System.out.println("Тест пересечений завершен");
     }

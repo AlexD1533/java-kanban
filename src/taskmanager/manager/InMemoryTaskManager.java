@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class InMemoryTaskManager implements TaskManager {
-    private static int counter = 0;
+    private static int counter;
     private static final Map<Integer, Task> tasks = new HashMap<>();
     private static final Map<Integer, Epic> epics = new HashMap<>();
     private final HistoryManager historyManager = Managers.getDefaultHistory();
@@ -109,13 +109,33 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Нельзя добавить задачу, задачи пересекаются по времени");
         }
     }
+@Override
+    public Optional<Integer> getMaxId() {
+        if (!getAllTasks().isEmpty()) {
+            int maxId = getAllTasks().descendingKeySet().getFirst();
+            return Optional.of(maxId);
+        } else {
+            return Optional.empty();
+        }
+}
 
     @Override
     public void createTask(TaskType type, String name, String description, int epicId, TaskProgress status, String startTime, long minutesForDuration, String endTime) {
         if (!Validation.inputValidation(name, startTime, endTime)) {
             return;
         }
-        int id = counter++;
+if (getMaxId().isPresent()) {
+    counter = getMaxId().get() + 1;
+} else {
+    counter = 0;
+}
+
+        System.out.println("///// counter " + counter);
+
+        int id = counter;
+
+        System.out.println("///// id " + id);
+
         switch (type) {
             case TaskType.TASK:
                 addTask(id, new Task(id, name, description, type, status, startTime, minutesForDuration));

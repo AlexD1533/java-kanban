@@ -32,6 +32,8 @@ public interface TaskManager {
     void addSubtask(int id, Subtask subtask);
 
 
+    Optional<Integer> getMaxId();
+
     void createTask(TaskType type, String name, String description, int epicId, TaskProgress status, String startTime, long minutesForDuration, String endTime);
 
     void deleteTasksById(TaskType type, int id);
