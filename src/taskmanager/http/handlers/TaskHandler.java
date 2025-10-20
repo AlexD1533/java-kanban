@@ -40,9 +40,9 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             case POST_CREATE -> handleCreate(exchange);
             case POST_UPDATE -> handleUpdate(exchange);
             case DELETE -> handleDeleteById(exchange);
-            case UNKNOWN -> {
-                break;
-            }
+            case UNKNOWN ->
+                sendNotFound(exchange, "Path not found");
+
         }
     }
 
