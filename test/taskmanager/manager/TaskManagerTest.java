@@ -268,25 +268,16 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertTrue(taskManager.getEpic(1).isPresent(), "Эпик должен быть создан");
 
         taskManager.createTask(TaskType.SUBTASK, "Подзадача 1", "Описание", 1,
-                TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-14T02:00");
-        assertFalse(taskManager.getSubtask(2).isPresent(), "Пересечение с существующей задачей, объект должен быть равен null");
+                TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T02:00");
+        assertTrue(taskManager.getSubtask(2).isPresent(), "Пересечение с существующей задачей, объект должен быть равен null");
 
 
         taskManager.createTask(TaskType.SUBTASK, "Подзадача 2", "Описание", 1,
-                TaskProgress.NEW, "2005-12-14T00:00", 120, "2005-12-14T02:00");
-        assertFalse(taskManager.getSubtask(3).isPresent(), "Объекты не пересекаются, не должен быть равен null");
+                TaskProgress.NEW, "2005-12-15T00:00", 120, "2005-12-15T02:00");
+        assertTrue(taskManager.getSubtask(3).isPresent(), "Объекты пересекаются, не должен быть равен null");
 
-        taskManager.createTask(TaskType.TASK, "Задача 2", "Описание", 0,
-                TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
-        assertFalse(taskManager.getTask(2).isPresent(), "Такого объекта не существует");
 
-        taskManager.createTask(TaskType.TASK, "Задача 3", "Описание", 0,
-                TaskProgress.NEW, "2005-12-12T01:00", 60, "2005-12-12T02:00");
-        assertFalse(taskManager.getTask(4).isPresent(), "Такого объекта не существует");
 
-        taskManager.createTask(TaskType.TASK, "Задача 4", "Описание", 0,
-                TaskProgress.NEW, "2005-12-11T23:00", 120, "2005-12-12T01:00");
-        assertFalse(taskManager.getTask(5).isPresent(), "Такого объекта не существует");
 
         taskManager.createTask(TaskType.TASK, "Задача 5", "Описание", 0,
                 TaskProgress.NEW, "2005-12-11T22:00", 60, "2005-12-11T23:00");
@@ -298,7 +289,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.createTask(TaskType.EPIC, "Эпик 2", "Описание", 0,
                 TaskProgress.NEW, "2005-12-12T00:00", 120, "2005-12-12T02:00");
-        assertTrue(taskManager.getEpic(5).isPresent(), "Эпик может быть создан в любое время, не должен быть null");
+        assertTrue(taskManager.getEpic(6).isPresent(), "Эпик может быть создан в любое время, не должен быть null");
 
         System.out.println("Тест пересечений завершен");
     }

@@ -94,7 +94,9 @@ public class InMemoryHistoryManager implements HistoryManager {
         while (current != null) {
             result.add(current.data);
             current = current.next;
+
         }
+
         return result;
     }
 }

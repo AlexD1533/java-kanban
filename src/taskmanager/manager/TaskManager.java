@@ -11,7 +11,7 @@ public interface TaskManager {
 
     boolean checkIntersections(Task t1, Task t2);
 
-    Optional<Boolean> checkIntersectionsByList(Task t1);
+    boolean checkIntersectionsByList(Task t1);
 
     List<Task> getPrioritizedTasks();
 
