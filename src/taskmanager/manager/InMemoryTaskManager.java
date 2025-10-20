@@ -76,12 +76,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addTask(int id, Task task) {
         boolean isIntersection = checkIntersectionsByList(task).orElseThrow(() ->
-                new RuntimeException("Ошибка сравнения пересечений"));
+                new RuntimeException("Ошибка получения значения пересечений"));
         if (!isIntersection) {
             tasks.put(id, task);
             System.out.println("Задача создана: " + id + " ");
         } else {
-            System.out.println("Нельзя добавить задачу, задачи пересекаются по времени");
+            System.out.println("задачи пересекаются по времени");
+            throw new RuntimeException("Нельзя добавить задачу, задачи пересекаются по времени");
         }
     }
 
@@ -94,7 +95,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addSubtask(int id, Subtask subtask) {
         boolean isIntersection = checkIntersectionsByList(subtask).orElseThrow(() ->
-                new RuntimeException("Ошибка сравнения пересечений"));
+                new RuntimeException("Ошибка получения значения пересечений"));
         if (!isIntersection) {
             int epicId = subtask.getEpicId();
             Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
@@ -106,7 +107,8 @@ public class InMemoryTaskManager implements TaskManager {
             updateEpicTaskStatus(epicId);
             System.out.println("Подзадача создана: " + id + " " + subtask.getName() + " в эпике №" + epicId);
         } else {
-            System.out.println("Нельзя добавить задачу, задачи пересекаются по времени");
+            3  System.out.println("задачи пересекаются по времени");
+            throw new RuntimeException("Нельзя добавить задачу, задачи пересекаются по времени");
         }
     }
 @Override
