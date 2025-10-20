@@ -1,5 +1,6 @@
 package taskmanager.util;
 
+import taskmanager.manager.exceptions.NotFoundException;
 import taskmanager.model.Epic;
 import taskmanager.model.Task;
 import taskmanager.model.Subtask;
@@ -44,8 +45,7 @@ public final class Validation {
 
     public static boolean taskValidation(int id, Map<Integer, Task> tasks) {
         if (!tasks.containsKey(id)) {
-            System.out.println("Задача " + id + " не существует.");
-            return false;
+            throw new NotFoundException("Задача " + id + " не существует.");
         }
         return true;
     }

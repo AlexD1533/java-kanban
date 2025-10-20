@@ -125,8 +125,12 @@ public class BaseHttpHandler {
         h.close();
     }
 
-    protected void sendNotFound(HttpExchange h) throws IOException {
-        h.sendResponseHeaders(404, 0);
+    protected void sendNotFound(HttpExchange h, String text) throws IOException {
+        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+        h.getResponseHeaders().add("Content-Type", "text/plain");
+
+        h.sendResponseHeaders(404, resp.length);
+        h.getResponseBody().write(resp);
         h.close();
     }
 

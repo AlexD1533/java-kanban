@@ -1,11 +1,10 @@
 package taskmanager.manager;
 
-import taskmanager.model.Epic;
-import taskmanager.model.Task;
-import taskmanager.model.Subtask;
-import taskmanager.model.TaskProgress;
-import taskmanager.model.TaskType;
+import taskmanager.manager.exceptions.ManagerSaveException;
+import taskmanager.manager.exceptions.NotFoundException;
+import taskmanager.model.*;
 import taskmanager.util.Validation;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,7 +14,8 @@ public class InMemoryTaskManager implements TaskManager {
     private static final Map<Integer, Task> tasks = new HashMap<>();
     private static final Map<Integer, Epic> epics = new HashMap<>();
     private final HistoryManager historyManager = Managers.getDefaultHistory();
-@Override
+
+    @Override
     public Map<Integer, Task> getTasks() {
         return Map.copyOf(tasks);
     }
@@ -82,7 +82,7 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Задача создана: " + id + " ");
         } else {
             System.out.println("задачи пересекаются по времени");
-            throw new RuntimeException("Нельзя добавить задачу, задачи пересекаются по времени");
+            throw new ManagerSaveException("Нельзя добавить задачу, задачи пересекаются по времени");
         }
     }
 
@@ -107,11 +107,12 @@ public class InMemoryTaskManager implements TaskManager {
             updateEpicTaskStatus(epicId);
             System.out.println("Подзадача создана: " + id + " " + subtask.getName() + " в эпике №" + epicId);
         } else {
-            3  System.out.println("задачи пересекаются по времени");
-            throw new RuntimeException("Нельзя добавить задачу, задачи пересекаются по времени");
+            System.out.println("задачи пересекаются по времени");
+            throw new ManagerSaveException("Нельзя добавить задачу, задачи пересекаются по времени");
         }
     }
-@Override
+
+    @Override
     public Optional<Integer> getMaxId() {
         if (!getAllTasks().isEmpty()) {
             int maxId = getAllTasks().descendingKeySet().getFirst();
@@ -119,47 +120,48 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
             return Optional.empty();
         }
-}
+    }
 
     @Override
     public void createTask(TaskType type, String name, String description, int epicId, TaskProgress status, String startTime, long minutesForDuration, String endTime) {
         if (!Validation.inputValidation(name, startTime, endTime)) {
             return;
         }
-if (getMaxId().isPresent()) {
-    counter = getMaxId().get() + 1;
-} else {
-    counter = 0;
-}
+        if (getMaxId().isPresent()) {
+            counter = getMaxId().get() + 1;
+        } else {
+            counter = 0;
+        }
 
         System.out.println("///// counter " + counter);
 
         int id = counter;
 
         System.out.println("///// id " + id);
+        try {
+            switch (type) {
+                case TaskType.TASK:
+                    addTask(id, new Task(id, name, description, type, status, startTime, minutesForDuration));
 
-        switch (type) {
-            case TaskType.TASK:
-                addTask(id, new Task(id, name, description, type, status, startTime, minutesForDuration));
-
-                break;
-            case TaskType.EPIC:
-                TaskProgress defaultStatus = TaskProgress.NEW;
-                addEpic(id, new Epic(id, name, description, type, defaultStatus, new HashMap<>()));
-
-                break;
-            case TaskType.SUBTASK:
-                if (!Validation.epicValidation(epicId, epics)) {
                     break;
-                }
+                case TaskType.EPIC:
+                    TaskProgress defaultStatus = TaskProgress.NEW;
+                    addEpic(id, new Epic(id, name, description, type, defaultStatus, new HashMap<>()));
 
-                addSubtask(id, new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration));
+                    break;
+                case TaskType.SUBTASK:
+                    if (!Validation.epicValidation(epicId, epics)) {
+                        break;
+                    }
 
-
-                break;
-            default:
-                System.out.println("Неправильный тип задачи");
-                break;
+                    addSubtask(id, new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration));
+                    break;
+                default:
+                    System.out.println("Неправильный тип задачи");
+                    break;
+            }
+        } catch (ManagerSaveException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -168,14 +170,16 @@ if (getMaxId().isPresent()) {
 
         switch (type) {
             case TaskType.TASK:
-                if (!Validation.taskValidation(id, tasks)) {
+                if (!tasks.containsKey(id)) {
+                   throw new NotFoundException ("Задачи с id " + id + " не существует");
+                } else {
+                    tasks.remove(id);
+                    historyManager.remove(id);
                     break;
                 }
-                tasks.remove(id);
-                historyManager.remove(id);
-                break;
             case TaskType.EPIC:
                 if (!Validation.epicValidation(id, epics)) {
+
                     break;
                 }
                 List<Integer> idEpicList = new ArrayList<>(epics.get(id).getSubtasks().keySet());
@@ -229,36 +233,40 @@ if (getMaxId().isPresent()) {
         if (!Validation.inputValidation(name, startTime, endTime)) {
             return;
         }
-        switch (type) {
-            case TaskType.TASK:
-                if (!Validation.taskValidation(id, tasks)) {
-                    break;
-                }
-                System.out.println("Обновление задачи: " + id + " " + name);
-                addTask(id, new Task(id, name, description, type, status, startTime, minutesForDuration));
+        try {
+            switch (type) {
+                case TaskType.TASK:
+                    if (!Validation.taskValidation(id, tasks)) {
+                        break;
+                    }
+                    System.out.println("Обновление задачи: " + id + " " + name);
+                    addTask(id, new Task(id, name, description, type, status, startTime, minutesForDuration));
 
-                break;
-            case TaskType.EPIC:
-                if (!Validation.epicValidation(id, epics)) {
                     break;
-                }
-                System.out.println("Обновление эпика: " + id + " " + name);
-                addEpic(id, new Epic(id, name, description, type, status, epics.get(id).getSubtasks()));
-                break;
-            case TaskType.SUBTASK:
-                if (!Validation.epicValidation(epicId, epics)) {
+                case TaskType.EPIC:
+                    if (!Validation.epicValidation(id, epics)) {
+                        break;
+                    }
+                    System.out.println("Обновление эпика: " + id + " " + name);
+                    addEpic(id, new Epic(id, name, description, type, status, epics.get(id).getSubtasks()));
                     break;
-                }
-                if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
-                    break;
-                }
+                case TaskType.SUBTASK:
+                    if (!Validation.epicValidation(epicId, epics)) {
+                        break;
+                    }
+                    if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
+                        break;
+                    }
 
-                addSubtask(id, new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration));
-                System.out.println("Обновление подзадачи: " + id + " " + name + " в эпике: " + epicId);
-                break;
-            default:
-                System.out.println("Неправильный тип задачи");
-                break;
+                    addSubtask(id, new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration));
+                    System.out.println("Обновление подзадачи: " + id + " " + name + " в эпике: " + epicId);
+                    break;
+                default:
+                    System.out.println("Неправильный тип задачи");
+                    break;
+            }
+        } catch (ManagerSaveException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -337,13 +345,13 @@ if (getMaxId().isPresent()) {
 
     @Override
     public Optional<Task> getTask(int id) {
-        if (!Validation.taskValidation(id, tasks)) {
-            return Optional.empty();
-        }
 
+ if (tasks.containsKey(id)) {
         historyManager.addTask(tasks.get(id));
         return Optional.of(tasks.get(id));
     }
+        return Optional.empty();
+}
 
     @Override
     public Optional<Subtask> getSubtask(int id) {

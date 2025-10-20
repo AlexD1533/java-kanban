@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import taskmanager.http.Endpoint;
 import taskmanager.manager.TaskManager;
+import taskmanager.manager.exceptions.NotFoundException;
 import taskmanager.model.Task;
 import taskmanager.model.TaskType;
 
@@ -50,7 +51,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         System.out.println("handleGet: " + allTask);
 
         if (allTask.isEmpty()) {
-            sendNotFound(exchange);
+            sendNotFound(exchange, "list is empty");
             System.out.println("list is empty");
             return;
         }
@@ -65,25 +66,28 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         if (taskId.isPresent()) {
             int id = taskId.get();
             if (manager.getTask(id).isPresent()) {
-                Task task = manager.getTask(id).get();
-                String response = gson.toJson(task);
-                sendText(exchange, response);
+                try {
+                    Task task = manager.getTask(id).get();
+                    String response = gson.toJson(task);
+                    sendText(exchange, response);
+
+                } catch (NotFoundException e) {
+                    sendNotFound(exchange, e.getMessage());
+                }
             } else {
-                sendNotFound(exchange);
+                sendNotFound(exchange, "ошибка ID");
             }
-        } else {
-            sendNotFound(exchange);
         }
     }
 
     private void handleCreate(HttpExchange exchange) throws IOException {
 
-String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-Task task = gson.fromJson(body, Task.class);
+        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        Task task = gson.fromJson(body, Task.class);
 
-    manager.createTask(TaskType.TASK, task.getName(), task.getDescription(), 0, task.getStatus(),
-            task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
-    sendText(exchange, task.toString());
+        manager.createTask(TaskType.TASK, task.getName(), task.getDescription(), 0, task.getStatus(),
+                task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
+        sendText(exchange, task.toString());
     }
 
     private void handleUpdate(HttpExchange exchange) throws IOException {
@@ -94,32 +98,28 @@ Task task = gson.fromJson(body, Task.class);
 
             Task task = gson.fromJson(body, Task.class);
             System.out.println("TASK " + task);
-                manager.updateTask(task.getType(), id, task.getName(), task.getDescription(), task.getStatus(),
-                        0, task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
-                sendText(exchange, task.toString());
-            } else{
-                sendNotFound(exchange);
-            }
+            manager.updateTask(task.getType(), id, task.getName(), task.getDescription(), task.getStatus(),
+                    0, task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
+            sendText(exchange, task.toString());
+        } else {
+            sendNotFound(exchange, "ошибка id");
         }
+    }
 
 
     private void handleDeleteById(HttpExchange exchange) throws IOException {
         Optional<Integer> taskId = getTaskId(exchange);
         if (taskId.isPresent()) {
             int id = taskId.get();
-            if (manager.getTask(id).isPresent()) {
-                try {
-                    Task task = manager.getTask(id).get();
-                    manager.deleteTasksById(task.getType(), id);
-                    sendText(exchange, task.toString());
-
-                } catch (RuntimeException e) {
-                    System.out.println(e.getMessage());
-                    sendNotFound(exchange);
-                }
-            } else {
-                sendNotFound(exchange);
+            try {
+                manager.deleteTasksById(TaskType.TASK, id);
+                sendText(exchange, "успех");
+            } catch (NotFoundException e) {
+                sendNotFound(exchange, e.getMessage());
             }
+        } else {
+            sendNotFound(exchange, "ошибка id");
         }
     }
 }
+
