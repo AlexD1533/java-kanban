@@ -45,10 +45,8 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetAll(HttpExchange exchange) throws IOException {
-
         List<Task> allTask = new ArrayList<>(manager.getTasks().values());
         System.out.println("handleGet: " + allTask);
-
         if (allTask.isEmpty()) {
             sendNotFound(exchange, "list is empty");
             return;
