@@ -6,20 +6,21 @@ import taskmanager.http.Endpoint;
 import taskmanager.manager.TaskManager;
 import taskmanager.manager.exceptions.ManagerSaveException;
 import taskmanager.manager.exceptions.NotFoundException;
-import taskmanager.model.Task;
+import taskmanager.model.Epic;
 import taskmanager.model.TaskType;
+import taskmanager.model.dto.EpicDTO;
+import taskmanager.model.dto.MapperEpic;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskHandler extends BaseHttpHandler implements HttpHandler {
-
-    private final String BASE_PATH_ENDPOINT = "tasks";
+public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
+    private final String BASE_PATH_ENDPOINT = "epics";
     private final TaskManager manager;
 
-    public TaskHandler(TaskManager manager) {
+    public EpicsHandler(TaskManager manager) {
         this.manager = manager;
     }
 
@@ -29,8 +30,6 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         String requestPath = exchange.getRequestURI().toString();
         String requestMethod = exchange.getRequestMethod();
         Endpoint endpoint = getEndpoint(BASE_PATH_ENDPOINT, requestPath, requestMethod);
-
-        System.out.println("endpoint: " + endpoint);
 
         switch (endpoint) {
 
@@ -45,13 +44,18 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetAll(HttpExchange exchange) throws IOException {
-        List<Task> allTask = new ArrayList<>(manager.getTasks().values());
-        System.out.println("handleGet: " + allTask);
-        if (allTask.isEmpty()) {
+        List<Epic> allEpics = new ArrayList<>(manager.getEpics().values());
+
+        List<EpicDTO> allEpicsDTO = allEpics.stream()
+                        .map(MapperEpic::toDto)
+                                        .toList();
+
+        System.out.println("handleGet: " + allEpics);
+        if (allEpicsDTO.isEmpty()) {
             sendNotFound(exchange, "Список пуст");
             return;
         }
-        String response = gson.toJson(allTask);
+        String response = gson.toJson(allEpicsDTO);
         sendText(exchange, response);
 
     }
@@ -59,8 +63,9 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     private void handleGetId(HttpExchange exchange) throws IOException {
         try {
             int id = getTaskId(exchange);
-            Task task = manager.getTask(id);
-            String response = gson.toJson(task);
+            EpicDTO epic = MapperEpic.toDto(manager.getEpic(id));
+            System.out.println(epic);
+            String response = gson.toJson(epic);
             sendText(exchange, response);
         } catch (NumberFormatException | NotFoundException e) {
             sendNotFound(exchange, e.getMessage());
@@ -70,11 +75,11 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     private void handleCreate(HttpExchange exchange) throws IOException {
 
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        Task task = gson.fromJson(body, Task.class);
+        EpicDTO epic = gson.fromJson(body, EpicDTO.class);
         try {
-            manager.createTask(TaskType.TASK, task.getName(), task.getDescription(), 0, task.getStatus(),
-                    task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
-            sendText(exchange, "Задача создана");
+            manager.createTask(TaskType.EPIC, epic.getName(), epic.getDescription(), 0, epic.getStatus(),
+                    epic.getStartTime().toString(), epic.getDuration(), epic.getEndTime().toString());
+            sendText(exchange, "Эпик создан");
         } catch (ManagerSaveException e) {
             sendHasInteractions(exchange, e.getMessage());
         }
@@ -84,10 +89,10 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         try {
             int id = getTaskId(exchange);
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-            Task task = gson.fromJson(body, Task.class);
-            manager.updateTask(task.getType(), id, task.getName(), task.getDescription(), task.getStatus(),
-                    0, task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
-            sendText(exchange, "Задача изменена");
+            EpicDTO epic = gson.fromJson(body, EpicDTO.class);
+            manager.updateTask(epic.getType(), id, epic.getName(), epic.getDescription(), epic.getStatus(),
+                    0, epic.getStartTime().toString(), epic.getDuration(), epic.getEndTime().toString());
+            sendText(exchange, "Эпик изменен");
         } catch (NumberFormatException | NotFoundException | ManagerSaveException e) {
             sendNotFound(exchange, e.getMessage());
         }
@@ -97,8 +102,8 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     private void handleDeleteById(HttpExchange exchange) throws IOException {
         try {
             int id = getTaskId(exchange);
-            manager.deleteTasksById(TaskType.TASK, id);
-            sendText(exchange, "Задача удалена");
+            manager.deleteTasksById(TaskType.EPIC, id);
+            sendText(exchange, "Эпик удален");
         } catch (NumberFormatException | NotFoundException e) {
             sendNotFound(exchange, e.getMessage());
         }

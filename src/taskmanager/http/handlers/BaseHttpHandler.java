@@ -24,7 +24,7 @@ public class BaseHttpHandler {
     }
 
     private Gson createGson() {
-        return  new GsonBuilder()
+        return new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new TaskHandler.LocalDateTimeAdapter())
                 .registerTypeAdapter(Duration.class, new TaskHandler.DurationAdapter())
                 .setPrettyPrinting().create();
@@ -32,13 +32,12 @@ public class BaseHttpHandler {
 
     public int getTaskId(HttpExchange exchange) {
         String[] paramPath = exchange.getRequestURI().toString().split("/");
-            if (paramPath[paramPath.length - 1] == null || paramPath[paramPath.length - 1].isBlank()) {
-                throw new NumberFormatException("Ошибка формата ID");
-            } else {
-                return Integer.parseInt(paramPath[paramPath.length - 1]);
-            }
+        if (paramPath[paramPath.length - 1] == null || paramPath[paramPath.length - 1].isBlank()) {
+            throw new NumberFormatException("Ошибка формата ID");
+        } else {
+            return Integer.parseInt(paramPath[paramPath.length - 1]);
         }
-
+    }
 
 
     protected static class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
@@ -87,7 +86,7 @@ public class BaseHttpHandler {
 
     protected Endpoint getEndpoint(String BASE_PATH_ENDPOINT, String requestPath, String requestMethod) {
 
-        System.out.println(BASE_PATH_ENDPOINT + " " + requestPath + " " + requestMethod );
+        System.out.println(BASE_PATH_ENDPOINT + " " + requestPath + " " + requestMethod);
 
 
         String[] pathParts = requestPath.split("/");
@@ -97,8 +96,7 @@ public class BaseHttpHandler {
             return Endpoint.GET_ALL;
         } else if (requestMethod.equals("GET") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 3) {
             return Endpoint.GET_BY_ID;
-        }
-        else if (requestMethod.equals("DELETE") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 3) {
+        } else if (requestMethod.equals("DELETE") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 3) {
             return Endpoint.DELETE;
         } else if (requestMethod.equals("POST") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 2) {
             return Endpoint.POST_CREATE;

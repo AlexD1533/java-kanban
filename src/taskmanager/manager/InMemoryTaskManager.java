@@ -19,8 +19,8 @@ public class InMemoryTaskManager implements TaskManager {
     public Map<Integer, Task> getTasks() {
         return Map.copyOf(tasks);
     }
-
-    public static Map<Integer, Epic> getEpics() {
+@Override
+    public Map<Integer, Epic> getEpics() {
         return Map.copyOf(epics);
     }
 
@@ -174,9 +174,8 @@ Subtask subtask = new Subtask(id, name, description, type, epicId, status, start
                     break;
                 }
             case TaskType.EPIC:
-                if (!Validation.epicValidation(id, epics)) {
-
-                    break;
+                if (!epics.containsKey(id)) {
+                    throw new NotFoundException("Эпика с id " + id + " не существует");
                 }
                 List<Integer> idEpicList = new ArrayList<>(epics.get(id).getSubtasks().keySet());
 
@@ -188,12 +187,13 @@ Subtask subtask = new Subtask(id, name, description, type, epicId, status, start
                 }
                 break;
             case TaskType.SUBTASK:
-                if (!Validation.subTaskValidation(id, epics)) {
-                    break;
+                if (!getAllSubtasks().containsKey(id)) {
+                    throw new NotFoundException("Подзадачи с id " + id + " не существует");
+
                 }
-                int epicId = getAllSubtasks(epics).get(id).getEpicId();
-                if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
-                    break;
+                int epicId = getAllSubtasks().get(id).getEpicId();
+                if (!epics.containsKey(epicId)) {
+                    throw new NotFoundException("Эпика с id " + id + " не существует");
                 }
                 Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
                 current.remove(id);
@@ -302,7 +302,7 @@ Subtask subtask = new Subtask(id, name, description, type, epicId, status, start
     }
 
     @Override
-    public Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics) {
+    public Map<Integer, Subtask> getAllSubtasks() {
         return allTasksStream()
                 .filter(t -> t instanceof Subtask)
                 .map(t -> (Subtask) t)
@@ -365,11 +365,11 @@ Subtask subtask = new Subtask(id, name, description, type, epicId, status, start
     @Override
     public Subtask getSubtask(int id) {
 
-        if (!getAllSubtasks(epics).containsKey(id)) {
+        if (!getAllSubtasks().containsKey(id)) {
             throw new NotFoundException("Подзадачи с id " + id + " не существует");
         }
-        historyManager.addTask(getAllSubtasks(epics).get(id));
-        return getAllSubtasks(epics).get(id);
+        historyManager.addTask(getAllSubtasks().get(id));
+        return getAllSubtasks().get(id);
     }
 
     @Override

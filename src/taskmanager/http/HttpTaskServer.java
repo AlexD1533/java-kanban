@@ -1,6 +1,8 @@
 package taskmanager.http;
 
 import com.sun.net.httpserver.HttpServer;
+import taskmanager.http.handlers.EpicsHandler;
+import taskmanager.http.handlers.SubtaskHandler;
 import taskmanager.http.handlers.TaskHandler;
 import taskmanager.manager.Managers;
 import taskmanager.manager.TaskManager;
@@ -16,6 +18,8 @@ public class HttpTaskServer {
         TaskManager manager = Managers.getFileBackedTaskManager();
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
 httpServer.createContext("/tasks", new TaskHandler(manager));
+httpServer.createContext("/subtasks", new SubtaskHandler(manager));
+httpServer.createContext("/epics", new EpicsHandler(manager));
         httpServer.start();
     }
 }

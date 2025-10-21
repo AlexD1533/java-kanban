@@ -9,6 +9,8 @@ public interface TaskManager {
 
     Map<Integer, Task> getTasks();
 
+    Map<Integer, Epic> getEpics();
+
     boolean checkIntersections(Task t1, Task t2);
 
     boolean checkIntersectionsByList(Task t1);
@@ -23,7 +25,7 @@ public interface TaskManager {
 
     Stream<Subtask> getEpicSubtasks(int epicId);
 
-    Map<Integer, Subtask> getAllSubtasks(Map<Integer, Epic> epics);
+
 
     void addTask(int id, Task task);
 
@@ -52,6 +54,8 @@ public interface TaskManager {
     void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId, String startTime, long minutesForDuration, String endTime);
 
     void printEpicSubtasks(int id);
+
+    Map<Integer, Subtask> getAllSubtasks();
 
     void updateEpicTaskStatus(int epicId);
 

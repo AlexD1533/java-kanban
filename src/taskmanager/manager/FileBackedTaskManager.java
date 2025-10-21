@@ -125,7 +125,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
 
             for (Subtask subtask : loadSubtasks) {
-                if (getEpics().get(subtask.getEpicId()) == null) {
+                if (manager.getEpics().get(subtask.getEpicId()) == null) {
                     System.out.println("SavedDataCSV.txt: Эпика для субтаска:" + subtask.getId() + " не существует.");
                 } else {
                     System.out.println("Загрузка подзадачи " + subtask.getId());
