@@ -14,7 +14,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Optional;
 
 public class BaseHttpHandler {
 
@@ -31,19 +30,15 @@ public class BaseHttpHandler {
                 .setPrettyPrinting().create();
     }
 
-    Optional<Integer> getTaskId(HttpExchange exchange) {
+    public int getTaskId(HttpExchange exchange) {
         String[] paramPath = exchange.getRequestURI().toString().split("/");
-        try {
             if (paramPath[paramPath.length - 1] == null || paramPath[paramPath.length - 1].isBlank()) {
-                return Optional.empty();
+                throw new NumberFormatException("Ошибка формата ID");
             } else {
-                return Optional.of(Integer.parseInt(paramPath[paramPath.length - 1]));
+                return Integer.parseInt(paramPath[paramPath.length - 1]);
             }
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-
         }
-    }
+
 
 
     protected static class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {

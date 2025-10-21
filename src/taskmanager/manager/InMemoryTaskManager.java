@@ -353,38 +353,33 @@ Subtask subtask = new Subtask(id, name, description, type, epicId, status, start
 
 
     @Override
-    public Optional<Task> getTask(int id) {
+    public Task getTask(int id) {
 
-        if (tasks.containsKey(id)) {
-            historyManager.addTask(tasks.get(id));
-            return Optional.of(tasks.get(id));
+        if (!tasks.containsKey(id)) {
+          throw new NotFoundException("Задачи с id " + id + " не существует");
         }
-        return Optional.empty();
+        historyManager.addTask(tasks.get(id));
+        return tasks.get(id);
     }
 
     @Override
-    public Optional<Subtask> getSubtask(int id) {
+    public Subtask getSubtask(int id) {
 
-        if (!Validation.subTaskValidation(id, epics)) {
-            return Optional.empty();
+        if (!getAllSubtasks(epics).containsKey(id)) {
+            throw new NotFoundException("Подзадачи с id " + id + " не существует");
         }
-        int epicId = getAllSubtasks(epics).get(id).getEpicId();
-
-        if (!Validation.subTaskValidationByEpic(epicId, id, epics)) {
-            return Optional.empty();
-        }
-        historyManager.addTask(epics.get(epicId).getSubtasks().get(id));
-        return Optional.of(epics.get(epicId).getSubtasks().get(id));
+        historyManager.addTask(getAllSubtasks(epics).get(id));
+        return getAllSubtasks(epics).get(id);
     }
 
     @Override
-    public Optional<Epic> getEpic(int id) {
+    public Epic getEpic(int id) {
 
-        if (!Validation.epicValidation(id, epics)) {
-            return Optional.empty();
+        if (!epics.containsKey(id)) {
+            throw new NotFoundException("Эпика с id " + id + " не существует");
         }
         historyManager.addTask(epics.get(id));
-        return Optional.of(epics.get(id));
+        return epics.get(id);
     }
 
 

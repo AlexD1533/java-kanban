@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
@@ -40,8 +39,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             case POST_CREATE -> handleCreate(exchange);
             case POST_UPDATE -> handleUpdate(exchange);
             case DELETE -> handleDeleteById(exchange);
-            case UNKNOWN ->
-                sendNotFound(exchange, "Path not found");
+            case UNKNOWN -> sendNotFound(exchange, "Path not found");
 
         }
     }
@@ -61,20 +59,13 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetId(HttpExchange exchange) throws IOException {
-
-        Optional<Integer> taskId = getTaskId(exchange);
-        if (taskId.isPresent()) {
-            int id = taskId.get();
-            if (manager.getTask(id).isPresent()) {
-                Task task = manager.getTask(id).get();
-                String response = gson.toJson(task);
-                sendText(exchange, response);
-            } else {
-                sendNotFound(exchange, "Task not found");
-            }
-
-        } else {
-            sendNotFound(exchange, "ошибка ID");
+        try {
+            int id = getTaskId(exchange);
+            Task task = manager.getTask(id);
+            String response = gson.toJson(task);
+            sendText(exchange, response);
+        } catch (NumberFormatException | NotFoundException e) {
+            sendNotFound(exchange, e.getMessage());
         }
     }
 
@@ -85,48 +76,33 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         try {
             manager.createTask(TaskType.TASK, task.getName(), task.getDescription(), 0, task.getStatus(),
                     task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
-            sendText(exchange, task.toString());
-
+            sendText(exchange, "Задача создана");
         } catch (ManagerSaveException e) {
             sendHasInteractions(exchange, e.getMessage());
         }
     }
 
     private void handleUpdate(HttpExchange exchange) throws IOException {
-        Optional<Integer> taskId = getTaskId(exchange);
-        if (taskId.isPresent()) {
-            int id = taskId.get();
-            System.out.println(id);
+        try {
+            int id = getTaskId(exchange);
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-
             Task task = gson.fromJson(body, Task.class);
-
-            try {
-                System.out.println("TASK " + task);
-                manager.updateTask(task.getType(), id, task.getName(), task.getDescription(), task.getStatus(),
-                        0, task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
-                sendText(exchange, task.toString());
-            } catch (NotFoundException | ManagerSaveException e) {
-                sendNotFound(exchange, e.getMessage());
-            }
-        } else {
-            sendNotFound(exchange, "ошибка ID");
+            manager.updateTask(task.getType(), id, task.getName(), task.getDescription(), task.getStatus(),
+                    0, task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
+            sendText(exchange, task.toString());
+        } catch (NumberFormatException | NotFoundException | ManagerSaveException e) {
+            sendNotFound(exchange, e.getMessage());
         }
+
     }
 
-
     private void handleDeleteById(HttpExchange exchange) throws IOException {
-        Optional<Integer> taskId = getTaskId(exchange);
-        if (taskId.isPresent()) {
-            int id = taskId.get();
-            try {
-                manager.deleteTasksById(TaskType.TASK, id);
-                sendText(exchange, "Задача удалена");
-            } catch (NotFoundException e) {
-                sendNotFound(exchange, e.getMessage());
-            }
-        } else {
-            sendNotFound(exchange, "ошибка id");
+        try {
+            int id = getTaskId(exchange);
+            manager.deleteTasksById(TaskType.TASK, id);
+            sendText(exchange, "Задача удалена");
+        } catch (NumberFormatException | NotFoundException e) {
+            sendNotFound(exchange, e.getMessage());
         }
     }
 }

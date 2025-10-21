@@ -42,11 +42,11 @@ public interface TaskManager {
 
     boolean deleteAllTasks();
 
-    Optional<Task> getTask(int id);
+    Task getTask(int id);
 
-    Optional<Subtask> getSubtask(int id);
+    Subtask getSubtask(int id);
 
-    Optional<Epic> getEpic(int id);
+    Epic getEpic(int id);
 
 
     void updateTask(TaskType type, int id, String name, String description, TaskProgress status, int epicId, String startTime, long minutesForDuration, String endTime);
