@@ -39,7 +39,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             case POST_CREATE -> handleCreate(exchange);
             case POST_UPDATE -> handleUpdate(exchange);
             case DELETE -> handleDeleteById(exchange);
-            case UNKNOWN -> sendNotFound(exchange, "Path not found");
+            case UNKNOWN -> writeResponse(exchange, "Path not found", 404);
 
         }
     }
@@ -48,11 +48,11 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         List<Task> allTask = new ArrayList<>(manager.getTasks().values());
         System.out.println("handleGet: " + allTask);
         if (allTask.isEmpty()) {
-            sendNotFound(exchange, "Список пуст");
+            writeResponse(exchange, "Список пуст", 404);
             return;
         }
         String response = gson.toJson(allTask);
-        sendText(exchange, response);
+        writeResponse(exchange, response, 200);
 
     }
 
@@ -61,9 +61,9 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             int id = getTaskId(exchange);
             Task task = manager.getTask(id);
             String response = gson.toJson(task);
-            sendText(exchange, response);
+            writeResponse(exchange, response, 200);
         } catch (NumberFormatException | NotFoundException e) {
-            sendNotFound(exchange, e.getMessage());
+            writeResponse(exchange, e.getMessage(), 404);
         }
     }
 
@@ -74,9 +74,9 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         try {
             manager.createTask(TaskType.TASK, task.getName(), task.getDescription(), 0, task.getStatus(),
                     task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
-            sendText(exchange, "Задача создана");
+            writeResponse(exchange, "Задача создана", 201);
         } catch (ManagerSaveException e) {
-            sendHasInteractions(exchange, e.getMessage());
+            writeResponse(exchange, e.getMessage(), 406);
         }
     }
 
@@ -85,11 +85,13 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             int id = getTaskId(exchange);
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
             Task task = gson.fromJson(body, Task.class);
-            manager.updateTask(task.getType(), id, task.getName(), task.getDescription(), task.getStatus(),
+            manager.updateTask(TaskType.TASK, id, task.getName(), task.getDescription(), task.getStatus(),
                     0, task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
-            sendText(exchange, "Задача изменена");
-        } catch (NumberFormatException | NotFoundException | ManagerSaveException e) {
-            sendNotFound(exchange, e.getMessage());
+            writeResponse(exchange, "Задача изменена", 201);
+        } catch (NumberFormatException | NotFoundException e) {
+            writeResponse(exchange, e.getMessage(), 404);
+        } catch (ManagerSaveException e) {
+            writeResponse(exchange, e.getMessage(), 406);
         }
 
     }
@@ -98,9 +100,9 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         try {
             int id = getTaskId(exchange);
             manager.deleteTasksById(TaskType.TASK, id);
-            sendText(exchange, "Задача удалена");
+            writeResponse(exchange, "Задача удалена",200);
         } catch (NumberFormatException | NotFoundException e) {
-            sendNotFound(exchange, e.getMessage());
+            writeResponse(exchange, e.getMessage(), 404);
         }
     }
 }

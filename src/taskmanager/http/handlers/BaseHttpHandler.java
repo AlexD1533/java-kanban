@@ -3,10 +3,13 @@ package taskmanager.http.handlers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import com.sun.net.httpserver.HttpExchange;
 import taskmanager.http.Endpoint;
+import taskmanager.model.Subtask;
+import taskmanager.model.Task;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +17,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.List;
 
 public class BaseHttpHandler {
 
@@ -30,12 +34,17 @@ public class BaseHttpHandler {
                 .setPrettyPrinting().create();
     }
 
+    protected static class ListSubtaskToken extends TypeToken<List<Subtask>> {
+    }
+    protected static class ListTaskToken extends TypeToken<List<Task>> {
+    }
+
     public int getTaskId(HttpExchange exchange) {
         String[] paramPath = exchange.getRequestURI().toString().split("/");
-        if (paramPath[paramPath.length - 1] == null || paramPath[paramPath.length - 1].isBlank()) {
+        if (paramPath[2] == null || paramPath[2].isBlank()) {
             throw new NumberFormatException("Ошибка формата ID");
         } else {
-            return Integer.parseInt(paramPath[paramPath.length - 1]);
+            return Integer.parseInt(paramPath[2]);
         }
     }
 
@@ -96,6 +105,9 @@ public class BaseHttpHandler {
             return Endpoint.GET_ALL;
         } else if (requestMethod.equals("GET") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 3) {
             return Endpoint.GET_BY_ID;
+        } else if (requestMethod.equals("GET") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 4 &&
+        pathParts[3].equals("subtasks")) {
+            return Endpoint.GET_SUBTASKS;
         } else if (requestMethod.equals("DELETE") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 3) {
             return Endpoint.DELETE;
         } else if (requestMethod.equals("POST") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 2) {
@@ -107,29 +119,13 @@ public class BaseHttpHandler {
         }
     }
 
-    protected void sendText(HttpExchange h, String text) throws IOException {
+    protected void writeResponse(HttpExchange h, String text, int statusCode) throws IOException {
 
-        System.out.println("sendText " + text);
+        System.out.println("writeResponse " + text);
 
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
         h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        h.sendResponseHeaders(200, resp.length);
-        h.getResponseBody().write(resp);
-        h.close();
-    }
-
-    protected void sendNotFound(HttpExchange h, String text) throws IOException {
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        h.getResponseHeaders().add("Content-Type", "text/plain");
-        h.sendResponseHeaders(404, resp.length);
-        h.getResponseBody().write(resp);
-        h.close();
-    }
-
-    protected void sendHasInteractions(HttpExchange h, String text) throws IOException {
-        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
-        h.getResponseHeaders().add("Content-Type", "text/plain");
-        h.sendResponseHeaders(406, resp.length);
+        h.sendResponseHeaders(statusCode, resp.length);
         h.getResponseBody().write(resp);
         h.close();
     }

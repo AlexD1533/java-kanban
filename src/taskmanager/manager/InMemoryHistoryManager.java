@@ -1,5 +1,6 @@
 package taskmanager.manager;
 
+import taskmanager.manager.exceptions.NotFoundException;
 import taskmanager.model.Node;
 import taskmanager.model.Task;
 
@@ -29,6 +30,9 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
+        if (getTasks().isEmpty()) {
+            throw new NotFoundException("Список истории пуст");
+        }
         return getTasks();
     }
 

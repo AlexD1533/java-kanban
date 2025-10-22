@@ -23,7 +23,7 @@ public interface TaskManager {
     Stream<Task> allTasksStream();
 
 
-    Stream<Subtask> getEpicSubtasks(int epicId);
+    List<Subtask> getEpicSubtasks(int epicId);
 
 
 

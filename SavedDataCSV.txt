@@ -1,4 +1,5 @@
 id,type,name,status,description,epic,startTime,duration,endTime
 0,TASK,Задача 1,NEW,Выполнить работу,no_epic_id,2005-12-12T00:00,120,2005-12-12T02:00
-1,EPIC,Эпик 1,NEW,Выполнить работу,no_epic_id,2005-12-14T00:00,120,2005-12-14T02:00
-2,SUBTASK,подзадача ИЗМЕНЕНА,NEW,Выполнить работу,1,2005-12-14T00:00,120,2005-12-14T02:00
+1,EPIC,Эпик new123123,NEW,Выполнить работу,no_epic_id,2003-12-14T00:00,527400,2004-12-14T06:00
+3,SUBTASK,Subtask1wddddddaaqweqwe11 ,NEW,Выполнить работу,1,2004-12-14T00:00,360,2004-12-14T06:00
+4,SUBTASK,Subtask1wddddddaaqweqwe11 ,NEW,Выполнить работу,1,2003-12-14T00:00,360,2003-12-14T06:00

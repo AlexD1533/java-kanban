@@ -143,7 +143,8 @@ public class InMemoryTaskManager implements TaskManager {
                     break;
                 case TaskType.SUBTASK:
                     if (!epics.containsKey(epicId)) {
-                        break;
+                       throw new ManagerSaveException("Эпика с ID " + epicId
+                               + "не существует, подзадачу добавить невозможно");
                     }
 Subtask subtask = new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration);
                     if (!checkIntersectionsByList(subtask)) {
@@ -297,8 +298,18 @@ Subtask subtask = new Subtask(id, name, description, type, epicId, status, start
     }
 
     @Override
-    public Stream<Subtask> getEpicSubtasks(int epicId) {
-        return epics.get(epicId).getSubtasks().values().stream();
+    public List<Subtask> getEpicSubtasks(int epicId) throws NotFoundException {
+        if (!epics.containsKey(epicId)) {
+            throw new NotFoundException("Эпика с ID " + epicId + " не существует");
+        }
+        List<Subtask> subtasks = epics.get(epicId).getSubtasks().values().stream().toList();
+
+        if (subtasks.isEmpty()) {
+            throw new NotFoundException("Список подзадач пуст");
+        }
+        return subtasks;
+
+
     }
 
     @Override

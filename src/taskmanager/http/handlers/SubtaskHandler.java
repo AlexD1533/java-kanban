@@ -36,7 +36,7 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
             case POST_CREATE -> handleCreate(exchange);
             case POST_UPDATE -> handleUpdate(exchange);
             case DELETE -> handleDeleteById(exchange);
-            case UNKNOWN -> sendNotFound(exchange, "Path not found");
+            case UNKNOWN -> writeResponse(exchange, "Path not found", 404);
         }
     }
 
@@ -44,11 +44,11 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
         List<Task> allTask = new ArrayList<>(manager.getAllSubtasks().values());
         System.out.println("handleGet: " + allTask);
         if (allTask.isEmpty()) {
-            sendNotFound(exchange, "Список пуст");
+            writeResponse(exchange, "Список пуст", 404);
             return;
         }
         String response = gson.toJson(allTask);
-        sendText(exchange, response);
+        writeResponse(exchange, response, 200);
 
     }
 
@@ -57,9 +57,9 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
             int id = getTaskId(exchange);
             Subtask subtask = manager.getSubtask(id);
             String response = gson.toJson(subtask);
-            sendText(exchange, response);
+            writeResponse(exchange, response, 200);
         } catch (NumberFormatException | NotFoundException e) {
-            sendNotFound(exchange, e.getMessage());
+            writeResponse(exchange, e.getMessage(), 404);
         }
     }
 
@@ -70,9 +70,9 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
         try {
             manager.createTask(TaskType.SUBTASK, subtask.getName(), subtask.getDescription(), subtask.getEpicId(), subtask.getStatus(),
                     subtask.getStartTime().toString(), subtask.getDuration(), subtask.getEndTime().toString());
-            sendText(exchange, "Подзадача создана");
+            writeResponse(exchange, "Подзадача создана", 201);
         } catch (ManagerSaveException e) {
-            sendHasInteractions(exchange, e.getMessage());
+            writeResponse(exchange, e.getMessage(), 406);
         }
     }
 
@@ -81,11 +81,13 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
             int id = getTaskId(exchange);
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
             Subtask subtask = gson.fromJson(body, Subtask.class);
-            manager.updateTask(subtask.getType(), id, subtask.getName(), subtask.getDescription(), subtask.getStatus(),
+            manager.updateTask(TaskType.SUBTASK, id, subtask.getName(), subtask.getDescription(), subtask.getStatus(),
                     subtask.getEpicId(), subtask.getStartTime().toString(), subtask.getDuration(), subtask.getEndTime().toString());
-            sendText(exchange, "Подзадача изменена");
-        } catch (NumberFormatException | NotFoundException | ManagerSaveException e) {
-            sendNotFound(exchange, e.getMessage());
+            writeResponse(exchange, "Подзадача изменена", 201);
+        } catch (NumberFormatException | NotFoundException e) {
+            writeResponse(exchange, e.getMessage(), 404);
+        } catch (ManagerSaveException e) {
+            writeResponse(exchange, e.getMessage(), 406);
         }
 
     }
@@ -94,9 +96,9 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
         try {
             int id = getTaskId(exchange);
             manager.deleteTasksById(TaskType.SUBTASK, id);
-            sendText(exchange, "Подзадача удалена");
+            writeResponse(exchange, "Подзадача удалена", 200);
         } catch (NumberFormatException | NotFoundException e) {
-            sendNotFound(exchange, e.getMessage());
+            writeResponse(exchange, e.getMessage(), 404);
         }
     }
 }
