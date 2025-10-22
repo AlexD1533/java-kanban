@@ -2,6 +2,7 @@ package taskmanager.manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import taskmanager.manager.exceptions.NotFoundException;
 import taskmanager.model.Task;
 import taskmanager.model.TaskProgress;
 import taskmanager.model.TaskType;
@@ -33,8 +34,9 @@ abstract class HistoryManagerTest<T extends HistoryManager> {
 
     @Test
     void getHistoryWhenEmpty() {
-        List<Task> history = historyManager.getHistory();
-        assertTrue(history.isEmpty(), "История должна быть пустой");
+        assertThrows(NotFoundException.class, () ->   historyManager.getHistory(),
+                "Если история пуста, должно выброситься исключение");
+
     }
 
     @Test
@@ -154,8 +156,8 @@ abstract class HistoryManagerTest<T extends HistoryManager> {
         historyManager.addTask(task1);
 
         historyManager.remove(task1.getId());
+        assertThrows(NotFoundException.class, () ->   historyManager.getHistory(),
+                "Если история пуста, должно выброситься исключение");
 
-        List<Task> history = historyManager.getHistory();
-        assertTrue(history.isEmpty(), "История должна быть пустой после удаления единственной задачи");
     }
 }

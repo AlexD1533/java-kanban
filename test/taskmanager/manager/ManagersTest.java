@@ -1,6 +1,7 @@
 package taskmanager.manager;
 
 import org.junit.jupiter.api.Test;
+import taskmanager.manager.exceptions.NotFoundException;
 import taskmanager.model.TaskProgress;
 import taskmanager.model.TaskType;
 
@@ -19,7 +20,9 @@ class ManagersTest {
     public void shouldReturnInitializedHistoryManager() {
         HistoryManager historyManager = Managers.getDefaultHistory();
         assertNotNull(historyManager, "Объект не может быть равен нулю");
-        assertTrue(historyManager.getHistory().isEmpty(), "Список должен быть пустым");
+        assertThrows(NotFoundException.class, () ->   historyManager.getHistory(),
+                "Если история пуста, должно выброситься исключение");
+
 
     }
 }
