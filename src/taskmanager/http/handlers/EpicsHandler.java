@@ -1,5 +1,6 @@
 package taskmanager.http.handlers;
 
+import com.google.gson.reflect.TypeToken;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import taskmanager.http.Endpoint;
@@ -9,8 +10,8 @@ import taskmanager.manager.exceptions.NotFoundException;
 import taskmanager.model.Epic;
 import taskmanager.model.Subtask;
 import taskmanager.model.TaskType;
-import taskmanager.model.dto.MapperTask;
-import taskmanager.model.dto.TaskDTO;
+import taskmanager.model.dto.MapperEpic;
+import taskmanager.model.dto.EpicDTO;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -59,8 +60,8 @@ writeResponse(exchange, response, 200);
     private void handleGetAll(HttpExchange exchange) throws IOException {
         List<Epic> allEpics = new ArrayList<>(manager.getEpics().values());
 
-        List<TaskDTO> allEpicsDTO = allEpics.stream()
-                        .map(MapperTask::toDto)
+        List<EpicDTO> allEpicsDTO = allEpics.stream()
+                        .map(MapperEpic::toDto)
                                         .toList();
 
         System.out.println("handleGet: " + allEpics);
@@ -76,7 +77,7 @@ writeResponse(exchange, response, 200);
     private void handleGetId(HttpExchange exchange) throws IOException {
         try {
             int id = getTaskId(exchange);
-            TaskDTO epic = MapperTask.toDto(manager.getEpic(id));
+            EpicDTO epic = MapperEpic.toDto(manager.getEpic(id));
             System.out.println(epic);
             String response = gson.toJson(epic);
             writeResponse(exchange, response, 200);
@@ -88,7 +89,7 @@ writeResponse(exchange, response, 200);
     private void handleCreate(HttpExchange exchange) throws IOException {
 
         String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        TaskDTO epic = gson.fromJson(body, TaskDTO.class);
+        EpicDTO epic = gson.fromJson(body, EpicDTO.class);
         try {
             manager.createTask(TaskType.EPIC, epic.getName(), epic.getDescription(), 0, epic.getStatus(),
                     epic.getStartTime().toString(), epic.getDuration(), epic.getEndTime().toString());
@@ -102,7 +103,7 @@ writeResponse(exchange, response, 200);
         try {
             int id = getTaskId(exchange);
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-            TaskDTO epic = gson.fromJson(body, TaskDTO.class);
+            EpicDTO epic = gson.fromJson(body, EpicDTO.class);
             manager.updateTask(TaskType.EPIC, id, epic.getName(), epic.getDescription(), epic.getStatus(),
                     0, epic.getStartTime().toString(), epic.getDuration(), epic.getEndTime().toString());
             writeResponse(exchange, "Эпик изменен", 201);
@@ -118,10 +119,16 @@ writeResponse(exchange, response, 200);
         try {
             int id = getTaskId(exchange);
             manager.deleteTasksById(TaskType.EPIC, id);
-            writeResponse(exchange, "Эпик удален", 200);
+            writeResponse(exchange, "Эпик удален", 201);
         } catch (NumberFormatException | NotFoundException e) {
             writeResponse(exchange, e.getMessage(), 404);
         }
     }
+
+    protected static class ListSubtaskToken extends TypeToken<List<Subtask>> {
+    }
+
+
+
 }
 

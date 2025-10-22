@@ -96,11 +96,14 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
         try {
             int id = getTaskId(exchange);
             manager.deleteTasksById(TaskType.SUBTASK, id);
-            writeResponse(exchange, "Подзадача удалена", 200);
+            writeResponse(exchange, "Подзадача удалена", 201);
         } catch (NumberFormatException | NotFoundException e) {
             writeResponse(exchange, e.getMessage(), 404);
         }
     }
+
+
+
 }
 
 

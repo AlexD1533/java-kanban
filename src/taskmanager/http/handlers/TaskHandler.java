@@ -100,7 +100,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         try {
             int id = getTaskId(exchange);
             manager.deleteTasksById(TaskType.TASK, id);
-            writeResponse(exchange, "Задача удалена",200);
+            writeResponse(exchange, "Задача удалена", 201);
         } catch (NumberFormatException | NotFoundException e) {
             writeResponse(exchange, e.getMessage(), 404);
         }

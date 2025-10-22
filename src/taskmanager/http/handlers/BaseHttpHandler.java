@@ -1,43 +1,17 @@
 package taskmanager.http.handlers;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import com.sun.net.httpserver.HttpExchange;
 import taskmanager.http.Endpoint;
-import taskmanager.model.Subtask;
-import taskmanager.model.Task;
+import taskmanager.http.gson.GsonUtil;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.List;
 
 public class BaseHttpHandler {
 
-    protected final Gson gson;
-
-    public BaseHttpHandler() {
-        this.gson = createGson();
-    }
-
-    private Gson createGson() {
-        return new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new TaskHandler.LocalDateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new TaskHandler.DurationAdapter())
-                .setPrettyPrinting().create();
-    }
-
-    protected static class ListSubtaskToken extends TypeToken<List<Subtask>> {
-    }
-    protected static class ListTaskToken extends TypeToken<List<Task>> {
-    }
+    protected final Gson gson = GsonUtil.createGson();
 
     public int getTaskId(HttpExchange exchange) {
         String[] paramPath = exchange.getRequestURI().toString().split("/");
@@ -45,50 +19,6 @@ public class BaseHttpHandler {
             throw new NumberFormatException("Ошибка формата ID");
         } else {
             return Integer.parseInt(paramPath[2]);
-        }
-    }
-
-
-    protected static class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-
-        @Override
-        public void write(JsonWriter jsonWriter, LocalDateTime localDateTime) throws IOException {
-            if (localDateTime == null) {
-                jsonWriter.nullValue();
-            } else {
-                jsonWriter.value(localDateTime.format(formatter));
-            }
-
-        }
-
-        @Override
-        public LocalDateTime read(JsonReader jsonReader) throws IOException {
-            String value = jsonReader.nextString();
-
-            return value != null ? LocalDateTime.parse(value, formatter) : null;
-        }
-    }
-
-
-    protected static class DurationAdapter extends TypeAdapter<Duration> {
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-
-        @Override
-        public void write(JsonWriter jsonWriter, Duration duration) throws IOException {
-            if (duration == null) {
-                jsonWriter.nullValue();
-            } else {
-                jsonWriter.value(duration.toMinutes());
-            }
-
-        }
-
-        @Override
-        public Duration read(JsonReader jsonReader) throws IOException {
-            long minutes = jsonReader.nextLong();
-
-            return Duration.ofMinutes(minutes);
         }
     }
 
@@ -129,5 +59,6 @@ public class BaseHttpHandler {
         h.getResponseBody().write(resp);
         h.close();
     }
+
 
 }

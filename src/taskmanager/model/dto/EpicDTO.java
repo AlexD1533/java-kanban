@@ -6,7 +6,7 @@ import taskmanager.model.TaskType;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class TaskDTO {
+public class EpicDTO {
 
     private int id;
     private  String name;
@@ -17,7 +17,7 @@ public class TaskDTO {
     private Duration duration;
     private LocalDateTime endTime;
 
-    public TaskDTO(int id, String name, String description, TaskProgress status,
+    public EpicDTO(int id, String name, String description, TaskProgress status,
                    TaskType type, LocalDateTime startTime, long duration, LocalDateTime endTime) {
         this.id = id;
         this.name = name;

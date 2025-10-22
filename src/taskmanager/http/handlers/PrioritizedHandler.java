@@ -5,8 +5,8 @@ import com.sun.net.httpserver.HttpHandler;
 import taskmanager.http.Endpoint;
 import taskmanager.manager.TaskManager;
 import taskmanager.manager.exceptions.NotFoundException;
-import taskmanager.model.dto.MapperTask;
-import taskmanager.model.dto.TaskDTO;
+import taskmanager.model.dto.MapperEpic;
+import taskmanager.model.dto.EpicDTO;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,11 +33,10 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
             case UNKNOWN -> writeResponse(exchange, "Path not found", 404);
         }
     }
-
     private void handleGetPrioritized(HttpExchange exchange) throws IOException {
         try {
-            List<TaskDTO> prioritized = manager.getPrioritizedTasks().stream()
-                    .map(MapperTask::toDto)
+            List<EpicDTO> prioritized = manager.getPrioritizedTasks().stream()
+                    .map(MapperEpic::toDto)
                     .toList();
             
             String response = gson.toJson(prioritized);
