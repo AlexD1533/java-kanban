@@ -12,7 +12,7 @@ import java.util.List;
 
 public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
 
-    private final String BASE_PATH_ENDPOINT = "history";
+    private final String basePathEndpoint = "history";
     private final TaskManager manager;
 
     public HistoryHandler(TaskManager manager) {
@@ -24,7 +24,7 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
 
         String requestPath = exchange.getRequestURI().toString();
         String requestMethod = exchange.getRequestMethod();
-        Endpoint endpoint = getEndpoint(BASE_PATH_ENDPOINT, requestPath, requestMethod);
+        Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
 
         System.out.println("endpoint: " + endpoint);
 

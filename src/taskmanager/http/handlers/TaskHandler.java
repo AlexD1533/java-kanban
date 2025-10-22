@@ -16,7 +16,7 @@ import java.util.List;
 
 public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
-    private final String BASE_PATH_ENDPOINT = "tasks";
+    private final String basePathEndpoint = "tasks";
     private final TaskManager manager;
 
     public TaskHandler(TaskManager manager) {
@@ -28,7 +28,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
 
         String requestPath = exchange.getRequestURI().toString();
         String requestMethod = exchange.getRequestMethod();
-        Endpoint endpoint = getEndpoint(BASE_PATH_ENDPOINT, requestPath, requestMethod);
+        Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
 
         System.out.println("endpoint: " + endpoint);
 

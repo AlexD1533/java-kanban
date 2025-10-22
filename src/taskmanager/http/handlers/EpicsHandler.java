@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
-    private final String BASE_PATH_ENDPOINT = "epics";
+    private final String basePathEndpoint = "epics";
     private final TaskManager manager;
 
     public EpicsHandler(TaskManager manager) {
@@ -29,7 +29,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
 
         String requestPath = exchange.getRequestURI().toString();
         String requestMethod = exchange.getRequestMethod();
-        Endpoint endpoint = getEndpoint(BASE_PATH_ENDPOINT, requestPath, requestMethod);
+        Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
 
         switch (endpoint) {
 

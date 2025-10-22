@@ -20,21 +20,21 @@ public class BaseHttpHandler {
         }
     }
 
-    protected Endpoint getEndpoint(String BASE_PATH_ENDPOINT, String requestPath, String requestMethod) {
+    protected Endpoint getEndpoint(String basePathEndpoint, String requestPath, String requestMethod) {
 
         String[] pathParts = requestPath.split("/");
-        if (requestMethod.equals("GET") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 2) {
+        if (requestMethod.equals("GET") && pathParts[1].equals(basePathEndpoint) && pathParts.length == 2) {
             return Endpoint.GET_ALL;
-        } else if (requestMethod.equals("GET") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 3) {
+        } else if (requestMethod.equals("GET") && pathParts[1].equals(basePathEndpoint) && pathParts.length == 3) {
             return Endpoint.GET_BY_ID;
-        } else if (requestMethod.equals("GET") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 4 &&
+        } else if (requestMethod.equals("GET") && pathParts[1].equals(basePathEndpoint) && pathParts.length == 4 &&
                 pathParts[3].equals("subtasks")) {
             return Endpoint.GET_SUBTASKS;
-        } else if (requestMethod.equals("DELETE") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 3) {
+        } else if (requestMethod.equals("DELETE") && pathParts[1].equals(basePathEndpoint) && pathParts.length == 3) {
             return Endpoint.DELETE;
-        } else if (requestMethod.equals("POST") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 2) {
+        } else if (requestMethod.equals("POST") && pathParts[1].equals(basePathEndpoint) && pathParts.length == 2) {
             return Endpoint.POST_CREATE;
-        } else if (requestMethod.equals("POST") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 3) {
+        } else if (requestMethod.equals("POST") && pathParts[1].equals(basePathEndpoint) && pathParts.length == 3) {
             return Endpoint.POST_UPDATE;
         } else {
             return Endpoint.UNKNOWN;

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
-    private final String BASE_PATH_ENDPOINT = "subtasks";
+    private final String basePathEndpoint = "subtasks";
     private final TaskManager manager;
 
     public SubtaskHandler(TaskManager manager) {
@@ -26,7 +26,7 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
 
         String requestPath = exchange.getRequestURI().toString();
         String requestMethod = exchange.getRequestMethod();
-        Endpoint endpoint = getEndpoint(BASE_PATH_ENDPOINT, requestPath, requestMethod);
+        Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
 
         switch (endpoint) {
             case GET_ALL -> handleGetAll(exchange);

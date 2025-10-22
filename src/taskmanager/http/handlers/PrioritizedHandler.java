@@ -13,7 +13,7 @@ import java.util.List;
 
 public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
 
-    private final String BASE_PATH_ENDPOINT = "prioritized";
+    private final String basePathEndpoint = "prioritized";
     private final TaskManager manager;
 
     public PrioritizedHandler(TaskManager manager) {
@@ -25,7 +25,7 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
 
         String requestPath = exchange.getRequestURI().toString();
         String requestMethod = exchange.getRequestMethod();
-        Endpoint endpoint = getEndpoint(BASE_PATH_ENDPOINT, requestPath, requestMethod);
+        Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
         System.out.println("endpoint: " + endpoint);
 
         switch (endpoint) {
