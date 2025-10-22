@@ -1,5 +1,4 @@
 package taskmanager.http.handlers;
-
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import taskmanager.http.Endpoint;
@@ -9,7 +8,6 @@ import taskmanager.manager.exceptions.NotFoundException;
 import taskmanager.model.Subtask;
 import taskmanager.model.Task;
 import taskmanager.model.TaskType;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -49,7 +47,6 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
         }
         String response = gson.toJson(allTask);
         writeResponse(exchange, response, 200);
-
     }
 
     private void handleGetId(HttpExchange exchange) throws IOException {
@@ -101,9 +98,6 @@ public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
             writeResponse(exchange, e.getMessage(), 404);
         }
     }
-
-
-
 }
 
 

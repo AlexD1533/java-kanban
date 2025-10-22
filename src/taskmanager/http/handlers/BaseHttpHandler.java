@@ -4,10 +4,8 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import taskmanager.http.Endpoint;
 import taskmanager.http.gson.GsonUtil;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public class BaseHttpHandler {
 
@@ -22,21 +20,15 @@ public class BaseHttpHandler {
         }
     }
 
-
     protected Endpoint getEndpoint(String BASE_PATH_ENDPOINT, String requestPath, String requestMethod) {
 
-        System.out.println(BASE_PATH_ENDPOINT + " " + requestPath + " " + requestMethod);
-
-
         String[] pathParts = requestPath.split("/");
-        System.out.println("parts: " + Arrays.toString(pathParts) + " parts length " + pathParts.length);
-
         if (requestMethod.equals("GET") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 2) {
             return Endpoint.GET_ALL;
         } else if (requestMethod.equals("GET") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 3) {
             return Endpoint.GET_BY_ID;
         } else if (requestMethod.equals("GET") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 4 &&
-        pathParts[3].equals("subtasks")) {
+                pathParts[3].equals("subtasks")) {
             return Endpoint.GET_SUBTASKS;
         } else if (requestMethod.equals("DELETE") && pathParts[1].equals(BASE_PATH_ENDPOINT) && pathParts.length == 3) {
             return Endpoint.DELETE;
@@ -52,13 +44,10 @@ public class BaseHttpHandler {
     protected void writeResponse(HttpExchange h, String text, int statusCode) throws IOException {
 
         System.out.println("writeResponse " + text);
-
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
         h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
         h.sendResponseHeaders(statusCode, resp.length);
         h.getResponseBody().write(resp);
         h.close();
     }
-
-
 }

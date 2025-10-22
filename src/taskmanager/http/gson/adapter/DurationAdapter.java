@@ -19,6 +19,7 @@ public class DurationAdapter extends TypeAdapter<Duration> {
             jsonWriter.value(duration.toMinutes());
         }
     }
+
     @Override
     public Duration read(JsonReader jsonReader) throws IOException {
         long minutes = jsonReader.nextLong();

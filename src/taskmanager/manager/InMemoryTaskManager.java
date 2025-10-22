@@ -19,7 +19,8 @@ public class InMemoryTaskManager implements TaskManager {
     public Map<Integer, Task> getTasks() {
         return Map.copyOf(tasks);
     }
-@Override
+
+    @Override
     public Map<Integer, Epic> getEpics() {
         return Map.copyOf(epics);
     }
@@ -48,7 +49,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getPrioritizedTasks() {
-
+        priorityTasks.clear();
         priorityTasks.addAll(getAllTasks().values());
         return List.copyOf(priorityTasks);
     }
@@ -90,15 +91,15 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addSubtask(int id, Subtask subtask) {
-            int epicId = subtask.getEpicId();
-            Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
-            current.put(id, subtask);
+        int epicId = subtask.getEpicId();
+        Map<Integer, Subtask> current = new HashMap<>(epics.get(epicId).getSubtasks());
+        current.put(id, subtask);
 
-            addEpic(epicId, new Epic(epicId, epics.get(epicId).getName(),
-                    epics.get(epicId).getDescription(), epics.get(epicId).getType(),
-                    epics.get(epicId).getStatus(), current));
-            updateEpicTaskStatus(epicId);
-            System.out.println("Подзадача создана: " + id + " " + subtask.getName() + " в эпике №" + epicId);
+        addEpic(epicId, new Epic(epicId, epics.get(epicId).getName(),
+                epics.get(epicId).getDescription(), epics.get(epicId).getType(),
+                epics.get(epicId).getStatus(), current));
+        updateEpicTaskStatus(epicId);
+        System.out.println("Подзадача создана: " + id + " " + subtask.getName() + " в эпике №" + epicId);
     }
 
     @Override
@@ -124,42 +125,42 @@ public class InMemoryTaskManager implements TaskManager {
 
         int id = counter;
 
-            switch (type) {
-                case TaskType.TASK:
+        switch (type) {
+            case TaskType.TASK:
 
-                    Task task = new Task(id, name, description, type, status, startTime, minutesForDuration);
-                    if (!checkIntersectionsByList(task)) {
-                        addTask(id, task);
-                        break;
-                    } else {
-                        System.out.println("задачи пересекаются по времени");
-                        throw new ManagerSaveException("Нельзя добавить задачу, задачи пересекаются по времени");
-                    }
-
-                case TaskType.EPIC:
-                    TaskProgress defaultStatus = TaskProgress.NEW;
-                    addEpic(id, new Epic(id, name, description, type, defaultStatus, new HashMap<>()));
-
+                Task task = new Task(id, name, description, type, status, startTime, minutesForDuration);
+                if (!checkIntersectionsByList(task)) {
+                    addTask(id, task);
                     break;
-                case TaskType.SUBTASK:
-                    if (!epics.containsKey(epicId)) {
-                       throw new ManagerSaveException("Эпика с ID " + epicId
-                               + "не существует, подзадачу добавить невозможно");
-                    }
-Subtask subtask = new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration);
-                    if (!checkIntersectionsByList(subtask)) {
-                        addSubtask(id, subtask);
-                    } else {
+                } else {
+                    System.out.println("задачи пересекаются по времени");
+                    throw new ManagerSaveException("Нельзя добавить задачу, задачи пересекаются по времени");
+                }
 
-            System.out.println("задачи пересекаются по времени");
-            throw new ManagerSaveException("Нельзя добавить задачу, задачи пересекаются по времени");
+            case TaskType.EPIC:
+                TaskProgress defaultStatus = TaskProgress.NEW;
+                addEpic(id, new Epic(id, name, description, type, defaultStatus, new HashMap<>()));
+
+                break;
+            case TaskType.SUBTASK:
+                if (!epics.containsKey(epicId)) {
+                    throw new ManagerSaveException("Эпика с ID " + epicId
+                            + "не существует, подзадачу добавить невозможно");
+                }
+                Subtask subtask = new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration);
+                if (!checkIntersectionsByList(subtask)) {
+                    addSubtask(id, subtask);
+                } else {
+
+                    System.out.println("задачи пересекаются по времени");
+                    throw new ManagerSaveException("Нельзя добавить задачу, задачи пересекаются по времени");
+                }
+                break;
+            default:
+                System.out.println("Неправильный тип задачи");
+                break;
         }
-                    break;
-                default:
-                    System.out.println("Неправильный тип задачи");
-                    break;
-            }
-        }
+    }
 
 
     @Override
@@ -231,53 +232,53 @@ Subtask subtask = new Subtask(id, name, description, type, epicId, status, start
             return;
         }
 
-            switch (type) {
-                case TaskType.TASK:
-                    if (!tasks.containsKey(id)) {
-                        throw new NotFoundException("Задачи с id " + id + " не существует");
-                    }
+        switch (type) {
+            case TaskType.TASK:
+                if (!tasks.containsKey(id)) {
+                    throw new NotFoundException("Задачи с id " + id + " не существует");
+                }
 
-                    System.out.println("Обновление задачи: " + id + " " + name);
-                    Task task = new Task(id, name, description, type, status, startTime, minutesForDuration);
+                System.out.println("Обновление задачи: " + id + " " + name);
+                Task task = new Task(id, name, description, type, status, startTime, minutesForDuration);
 
-            if (!checkIntersectionsByList(task)) {
-                addTask(id, task);
-                break;
+                if (!checkIntersectionsByList(task)) {
+                    addTask(id, task);
+                    break;
 
-            } else {
+                } else {
                     System.out.println("задачи пересекаются по времени");
                     throw new ManagerSaveException("Нельзя добавить задачу, задачи пересекаются по времени");
                 }
 
-                case TaskType.EPIC:
-                    if (!epics.containsKey(id)) {
-                            throw new NotFoundException("Эпика с id " + id + " не существует");
-                        }
+            case TaskType.EPIC:
+                if (!epics.containsKey(id)) {
+                    throw new NotFoundException("Эпика с id " + id + " не существует");
+                }
 
-                    System.out.println("Обновление эпика: " + id + " " + name);
-                    addEpic(id, new Epic(id, name, description, type, status, epics.get(id).getSubtasks()));
-                    break;
-                case TaskType.SUBTASK:
+                System.out.println("Обновление эпика: " + id + " " + name);
+                addEpic(id, new Epic(id, name, description, type, status, epics.get(id).getSubtasks()));
+                break;
+            case TaskType.SUBTASK:
 
-                    if (!epics.containsKey(epicId) || !epics.get(epicId).getSubtasks().containsKey(id)) {
-                            throw new NotFoundException("Задачи с id " + id + " не существует");
-                    }
+                if (!epics.containsKey(epicId) || !epics.get(epicId).getSubtasks().containsKey(id)) {
+                    throw new NotFoundException("Задачи с id " + id + " не существует");
+                }
 
-                    System.out.println("Обновление подзадачи: " + id + " " + name + " в эпике: " + epicId);
-                    Subtask subtask = new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration);
-                    if (!checkIntersectionsByList(subtask)) {
-                        addSubtask(id, subtask);
-                    } else {
+                System.out.println("Обновление подзадачи: " + id + " " + name + " в эпике: " + epicId);
+                Subtask subtask = new Subtask(id, name, description, type, epicId, status, startTime, minutesForDuration);
+                if (!checkIntersectionsByList(subtask)) {
+                    addSubtask(id, subtask);
+                } else {
 
-                        System.out.println("задачи пересекаются по времени");
-                        throw new ManagerSaveException("Нельзя добавить задачу, задачи пересекаются по времени");
-                    }
-                    break;
+                    System.out.println("задачи пересекаются по времени");
+                    throw new ManagerSaveException("Нельзя добавить задачу, задачи пересекаются по времени");
+                }
+                break;
 
-                default:
-                    System.out.println("Неправильный тип задачи");
-                    break;
-            }
+            default:
+                System.out.println("Неправильный тип задачи");
+                break;
+        }
     }
 
     @Override
@@ -367,7 +368,7 @@ Subtask subtask = new Subtask(id, name, description, type, epicId, status, start
     public Task getTask(int id) {
 
         if (!tasks.containsKey(id)) {
-          throw new NotFoundException("Задачи с id " + id + " не существует");
+            throw new NotFoundException("Задачи с id " + id + " не существует");
         }
         historyManager.addTask(tasks.get(id));
         return tasks.get(id);

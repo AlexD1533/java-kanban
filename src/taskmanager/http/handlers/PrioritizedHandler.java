@@ -16,7 +16,7 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
     private final String BASE_PATH_ENDPOINT = "prioritized";
     private final TaskManager manager;
 
-    public PrioritizedHandler (TaskManager manager) {
+    public PrioritizedHandler(TaskManager manager) {
         this.manager = manager;
     }
 
@@ -33,12 +33,13 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
             case UNKNOWN -> writeResponse(exchange, "Path not found", 404);
         }
     }
+
     private void handleGetPrioritized(HttpExchange exchange) throws IOException {
         try {
             List<EpicDTO> prioritized = manager.getPrioritizedTasks().stream()
                     .map(MapperEpic::toDto)
                     .toList();
-            
+
             String response = gson.toJson(prioritized);
             writeResponse(exchange, response, 200);
         } catch (NotFoundException e) {

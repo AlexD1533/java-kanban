@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 public class EpicDTO {
 
     private int id;
-    private  String name;
-    private  String description;
+    private String name;
+    private String description;
     private TaskProgress status;
     private TaskType type;
     protected LocalDateTime startTime;

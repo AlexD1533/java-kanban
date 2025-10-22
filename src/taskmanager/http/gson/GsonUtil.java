@@ -16,7 +16,4 @@ public class GsonUtil {
                 .registerTypeAdapter(Duration.class, new DurationAdapter())
                 .setPrettyPrinting().create();
     }
-
-
-
 }

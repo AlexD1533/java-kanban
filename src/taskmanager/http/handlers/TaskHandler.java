@@ -40,7 +40,6 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             case POST_UPDATE -> handleUpdate(exchange);
             case DELETE -> handleDeleteById(exchange);
             case UNKNOWN -> writeResponse(exchange, "Path not found", 404);
-
         }
     }
 
@@ -53,7 +52,6 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         }
         String response = gson.toJson(allTask);
         writeResponse(exchange, response, 200);
-
     }
 
     private void handleGetId(HttpExchange exchange) throws IOException {
@@ -93,7 +91,6 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         } catch (ManagerSaveException e) {
             writeResponse(exchange, e.getMessage(), 406);
         }
-
     }
 
     private void handleDeleteById(HttpExchange exchange) throws IOException {
