@@ -104,8 +104,8 @@ public class HttpTaskManagerSubtasksTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(404, response.statusCode());
-        assertEquals("Список пуст", response.body());
+        assertEquals(204, response.statusCode());
+
     }
 
     @Test

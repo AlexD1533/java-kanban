@@ -20,41 +20,50 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
 
     public TaskHandler(TaskManager manager) {
+
         this.manager = manager;
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
-        String requestPath = exchange.getRequestURI().toString();
-        String requestMethod = exchange.getRequestMethod();
-        Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
+        try {
+            String requestPath = exchange.getRequestURI().toString();
+            String requestMethod = exchange.getRequestMethod();
+            Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
+            System.out.println("endpoint: " + endpoint);
 
-        System.out.println("endpoint: " + endpoint);
-
-        switch (endpoint) {
-
-            case GET_ALL -> handleGetAll(exchange);
-            case GET_BY_ID -> handleGetId(exchange);
-            case POST_CREATE -> handleCreate(exchange);
-            case POST_UPDATE -> handleUpdate(exchange);
-            case DELETE -> handleDeleteById(exchange);
-            case UNKNOWN -> writeResponse(exchange, "Path not found", 404);
+            startEndpoint(exchange, endpoint);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
 
-    private void handleGetAll(HttpExchange exchange) throws IOException {
-        List<Task> allTask = new ArrayList<>(manager.getTasks().values());
-        System.out.println("handleGet: " + allTask);
-        if (allTask.isEmpty()) {
-            writeResponse(exchange, "Список пуст", 404);
-            return;
+    @Override
+    protected void handleGetAll(HttpExchange exchange) throws IOException {
+
+        try {
+            List<Task> allTask = new ArrayList<>(manager.getTasks().values());
+            System.out.println("handleGet: " + allTask);
+            if (allTask.isEmpty()) {
+                writeResponseNoContent(exchange);
+                return;
+            }
+
+            String response = gson.toJson(allTask);
+            writeResponse(exchange, response, 200);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
-        String response = gson.toJson(allTask);
-        writeResponse(exchange, response, 200);
     }
 
-    private void handleGetId(HttpExchange exchange) throws IOException {
+
+    @Override
+    protected void handleGetId(HttpExchange exchange) throws IOException {
+
         try {
             int id = getTaskId(exchange);
             Task task = manager.getTask(id);
@@ -62,23 +71,33 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             writeResponse(exchange, response, 200);
         } catch (NumberFormatException | NotFoundException e) {
             writeResponse(exchange, e.getMessage(), 404);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
 
-    private void handleCreate(HttpExchange exchange) throws IOException {
+    @Override
+    protected void handleCreate(HttpExchange exchange) throws IOException {
 
-        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        Task task = gson.fromJson(body, Task.class);
         try {
+            String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            Task task = gson.fromJson(body, Task.class);
+
             manager.createTask(TaskType.TASK, task.getName(), task.getDescription(), 0, task.getStatus(),
                     task.getStartTime().toString(), task.getDuration(), task.getEndTime().toString());
             writeResponse(exchange, "Задача создана", 201);
         } catch (ManagerSaveException e) {
             writeResponse(exchange, e.getMessage(), 406);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
 
-    private void handleUpdate(HttpExchange exchange) throws IOException {
+    @Override
+    protected void handleUpdate(HttpExchange exchange) throws IOException {
+
         try {
             int id = getTaskId(exchange);
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
@@ -90,16 +109,24 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             writeResponse(exchange, e.getMessage(), 404);
         } catch (ManagerSaveException e) {
             writeResponse(exchange, e.getMessage(), 406);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
 
-    private void handleDeleteById(HttpExchange exchange) throws IOException {
+    @Override
+    protected void handleDeleteById(HttpExchange exchange) throws IOException {
+
         try {
             int id = getTaskId(exchange);
             manager.deleteTasksById(TaskType.TASK, id);
             writeResponse(exchange, "Задача удалена", 201);
         } catch (NumberFormatException | NotFoundException e) {
             writeResponse(exchange, e.getMessage(), 404);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
 }

@@ -17,24 +17,42 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
 
     public PrioritizedHandler(TaskManager manager) {
+
         this.manager = manager;
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
-        String requestPath = exchange.getRequestURI().toString();
-        String requestMethod = exchange.getRequestMethod();
-        Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
-        System.out.println("endpoint: " + endpoint);
+        try {
+            String requestPath = exchange.getRequestURI().toString();
+            String requestMethod = exchange.getRequestMethod();
+            Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
+            System.out.println("endpoint: " + endpoint);
 
-        switch (endpoint) {
-            case GET_ALL -> handleGetPrioritized(exchange);
-            case UNKNOWN -> writeResponse(exchange, "Path not found", 404);
+            startEndpoint(exchange, endpoint);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
+        }
+    }
+
+    @Override
+    protected void startEndpoint(HttpExchange exchange, Endpoint endpoint) throws IOException {
+
+        try {
+            switch (endpoint) {
+                case GET_ALL -> handleGetPrioritized(exchange);
+                case UNKNOWN -> writeResponse(exchange, "Path not found", 404);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
 
     private void handleGetPrioritized(HttpExchange exchange) throws IOException {
+
         try {
             List<EpicDTO> prioritized = manager.getPrioritizedTasks().stream()
                     .map(MapperEpic::toDto)
@@ -44,6 +62,34 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
             writeResponse(exchange, response, 200);
         } catch (NotFoundException e) {
             writeResponse(exchange, e.getMessage(), 404);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
+    }
+
+    @Override
+    protected void handleGetAll(HttpExchange exchange) throws IOException {
+
+    }
+
+    @Override
+    protected void handleGetId(HttpExchange exchange) throws IOException {
+
+    }
+
+    @Override
+    protected void handleCreate(HttpExchange exchange) throws IOException {
+
+    }
+
+    @Override
+    protected void handleUpdate(HttpExchange exchange) throws IOException {
+
+    }
+
+    @Override
+    protected void handleDeleteById(HttpExchange exchange) throws IOException {
+
     }
 }

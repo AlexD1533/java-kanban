@@ -1,4 +1,5 @@
 package taskmanager.http.handlers;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import taskmanager.http.Endpoint;
@@ -11,6 +12,7 @@ import taskmanager.model.Subtask;
 import taskmanager.model.TaskType;
 import taskmanager.model.dto.EpicDTO;
 import taskmanager.model.dto.MapperEpic;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -21,29 +23,47 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
 
     public EpicsHandler(TaskManager manager) {
+
         this.manager = manager;
+    }
+
+    @Override
+    protected void startEndpoint(HttpExchange exchange, Endpoint endpoint) throws IOException {
+
+        try {
+            switch (endpoint) {
+
+                case GET_ALL -> handleGetAll(exchange);
+                case GET_BY_ID -> handleGetId(exchange);
+                case GET_SUBTASKS -> handleGetSubtasks(exchange);
+                case POST_CREATE -> handleCreate(exchange);
+                case POST_UPDATE -> handleUpdate(exchange);
+                case DELETE -> handleDeleteById(exchange);
+                case UNKNOWN -> writeResponse(exchange, "Path not found", 404);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
+        }
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
-        String requestPath = exchange.getRequestURI().toString();
-        String requestMethod = exchange.getRequestMethod();
-        Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
+        try {
+            String requestPath = exchange.getRequestURI().toString();
+            String requestMethod = exchange.getRequestMethod();
+            Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
 
-        switch (endpoint) {
-
-            case GET_ALL -> handleGetAll(exchange);
-            case GET_BY_ID -> handleGetId(exchange);
-            case GET_SUBTASKS -> handleGetSubtasks(exchange);
-            case POST_CREATE -> handleCreate(exchange);
-            case POST_UPDATE -> handleUpdate(exchange);
-            case DELETE -> handleDeleteById(exchange);
-            case UNKNOWN -> writeResponse(exchange, "Path not found", 404);
+            startEndpoint(exchange, endpoint);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
 
-    private void handleGetSubtasks(HttpExchange exchange) throws IOException {
+    protected void handleGetSubtasks(HttpExchange exchange) throws IOException {
+
         try {
             int id = getTaskId(exchange);
             List<Subtask> subtasks = manager.getEpicSubtasks(id);
@@ -52,26 +72,38 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
 
         } catch (NumberFormatException | NotFoundException e) {
             writeResponse(exchange, e.getMessage(), 404);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
 
-    private void handleGetAll(HttpExchange exchange) throws IOException {
-        List<Epic> allEpics = new ArrayList<>(manager.getEpics().values());
+    @Override
+    protected void handleGetAll(HttpExchange exchange) throws IOException {
 
-        List<EpicDTO> allEpicsDTO = allEpics.stream()
-                .map(MapperEpic::toDto)
-                .toList();
+        try {
+            List<Epic> allEpics = new ArrayList<>(manager.getEpics().values());
 
-        System.out.println("handleGet: " + allEpics);
-        if (allEpicsDTO.isEmpty()) {
-            writeResponse(exchange, "Список пуст", 404);
-            return;
+            List<EpicDTO> allEpicsDTO = allEpics.stream()
+                    .map(MapperEpic::toDto)
+                    .toList();
+
+            System.out.println("handleGet: " + allEpics);
+            if (allEpicsDTO.isEmpty()) {
+                writeResponseNoContent(exchange);
+                return;
+            }
+            String response = gson.toJson(allEpicsDTO);
+            writeResponse(exchange, response, 200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
-        String response = gson.toJson(allEpicsDTO);
-        writeResponse(exchange, response, 200);
     }
 
-    private void handleGetId(HttpExchange exchange) throws IOException {
+    @Override
+    protected void handleGetId(HttpExchange exchange) throws IOException {
+
         try {
             int id = getTaskId(exchange);
             EpicDTO epic = MapperEpic.toDto(manager.getEpic(id));
@@ -80,23 +112,34 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
             writeResponse(exchange, response, 200);
         } catch (NumberFormatException | NotFoundException e) {
             writeResponse(exchange, e.getMessage(), 404);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
 
-    private void handleCreate(HttpExchange exchange) throws IOException {
+    @Override
 
-        String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-        EpicDTO epic = gson.fromJson(body, EpicDTO.class);
+    protected void handleCreate(HttpExchange exchange) throws IOException {
+
         try {
+            String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            EpicDTO epic = gson.fromJson(body, EpicDTO.class);
+
             manager.createTask(TaskType.EPIC, epic.getName(), epic.getDescription(), 0, epic.getStatus(),
                     epic.getStartTime().toString(), epic.getDuration(), epic.getEndTime().toString());
             writeResponse(exchange, "Эпик создан", 201);
         } catch (ManagerSaveException e) {
             writeResponse(exchange, e.getMessage(), 406);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
 
-    private void handleUpdate(HttpExchange exchange) throws IOException {
+    @Override
+    protected void handleUpdate(HttpExchange exchange) throws IOException {
+
         try {
             int id = getTaskId(exchange);
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
@@ -108,16 +151,24 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
             writeResponse(exchange, e.getMessage(), 404);
         } catch (ManagerSaveException e) {
             writeResponse(exchange, e.getMessage(), 406);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
 
-    private void handleDeleteById(HttpExchange exchange) throws IOException {
+    @Override
+    protected void handleDeleteById(HttpExchange exchange) throws IOException {
+
         try {
             int id = getTaskId(exchange);
             manager.deleteTasksById(TaskType.EPIC, id);
             writeResponse(exchange, "Эпик удален", 201);
         } catch (NumberFormatException | NotFoundException e) {
             writeResponse(exchange, e.getMessage(), 404);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
 }

@@ -1,4 +1,5 @@
 package taskmanager.http.handlers;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import taskmanager.http.Endpoint;
@@ -16,17 +17,12 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
 
     public HistoryHandler(TaskManager manager) {
+
         this.manager = manager;
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-
-        String requestPath = exchange.getRequestURI().toString();
-        String requestMethod = exchange.getRequestMethod();
-        Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
-
-        System.out.println("endpoint: " + endpoint);
+    protected void startEndpoint(HttpExchange exchange, Endpoint endpoint) throws IOException {
 
         switch (endpoint) {
 
@@ -35,7 +31,25 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+
+        try {
+            String requestPath = exchange.getRequestURI().toString();
+            String requestMethod = exchange.getRequestMethod();
+            Endpoint endpoint = getEndpoint(basePathEndpoint, requestPath, requestMethod);
+
+            System.out.println("endpoint: " + endpoint);
+            startEndpoint(exchange, endpoint);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
+        }
+    }
+
+
     private void handleGetHistory(HttpExchange exchange) throws IOException {
+
         try {
             List<EpicDTO> history = manager.getHistory().stream()
                     .map(MapperEpic::toDto)
@@ -44,6 +58,36 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
             writeResponse(exchange, response, 200);
         } catch (NotFoundException e) {
             writeResponse(exchange, e.getMessage(), 404);
+        } catch (Exception e) {
+            e.printStackTrace();
+            writeResponse(exchange, "Внутрення ошибка сервера", 500);
         }
     }
+
+    @Override
+    protected void handleGetAll(HttpExchange exchange) throws IOException {
+
+    }
+
+    @Override
+    protected void handleGetId(HttpExchange exchange) throws IOException {
+
+    }
+
+    @Override
+    protected void handleCreate(HttpExchange exchange) throws IOException {
+
+    }
+
+    @Override
+    protected void handleUpdate(HttpExchange exchange) throws IOException {
+
+    }
+
+    @Override
+    protected void handleDeleteById(HttpExchange exchange) throws IOException {
+
+    }
+
+
 }
